@@ -30,10 +30,10 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 % OTHER PARAMETERS (passed as parameter-value pairs)
 % * 'NoPlot': A true/false value which, if true, no figure is created
 %   (defaut: false)
-
+%
 % * 'CalcP': A true/false value which, if true, a log rank test is
 %   performed and diplayd on the KM-plot. (defaut: true)
-
+%
 % * 'CutPoint': Either a string or scalar/vector with cut points to be used
 %   for defining groups baased on a continious 'GroupVar' input variable
 %   Allowed names are: 'Median' or 'Quartile'
@@ -54,10 +54,56 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 %   defaut: false)
 %
 % * 'FlipColorOrder': Flips the color order of the groups. 
-%   defaut: false)
+%   (defaut: false)
 %
 % * 'BaseFontSize': Base fontsize for all text in the plot
 %   (Default: 16)
+%
+% * 'KM_position': Vector defning the KM axes for the KM plot
+%   (Default: [0.2 0.4 0.75 0.45])
+%
+% * 'RT_position': Vector defining the Risk Table axes for the KM plot
+%   (Default: [0.2 0.05 0.75 0.20])
+%
+% KM plot options
+%
+% * 'Xstep': Scalar defining the X tick step length. 
+%   (defaut: automatic)
+%
+% * 'XTicks': BVector defning the oisition of the X tick marks
+%   (Default: 16)
+%
+% * 'XMinorTick': Scalar defning the number of minor ticks between major X
+%   ticks (Default: 1)
+%
+% * 'RT_position': Vector defining the Risk Table axes for the KM plot
+%   (Default: [0.2 0.05 0.75 0.20]
+%
+% * 'XLim': Vector defining the XLim.Do not affect the log rank test
+%   (defaut: automatic)
+%
+% * 'LineColor': Either a matrix of size numLevels-by-3 representing the
+%   colormap to be used or a string for a MATLAB colormap
+%   (defaut: 'lines')
+%
+% * 'LineWidth': Scalar defining the linewith used in the KM-plot
+%   (Default: 2)
+%
+% * 'LineStyle': Cell array defining the linestyle for the KM-plot. 
+%   If an array is given each group will have differbt linestyle, for example
+%   'LineStyle',{'-','--',':','-.'}
+%   (Default: {'-'})
+%
+% * 'CensorLineWidth': Scalar defining the linewith of the censored ticks
+%   (defaut: 2)
+%
+% * 'CensorLineLength':Scalar defining the length of the censored ticks
+%   (Default: 0.02)
+%
+% * 'CensorLineColor': Cell array defining the linestyle for the KM-plot. 
+%   If an array is given each group will have different linestyle, for example
+%   'LineStyle',{'-','--',':','-.'}
+%   (Default: 'same')
 %
 % *** Anders Berglund ***
 
