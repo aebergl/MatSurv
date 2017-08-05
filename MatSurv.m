@@ -27,9 +27,6 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 % * fh      : figure handle to KM-plot figure
 % * stats   : Additional statistics from the log rank test
 %
-
-p.addParameter('BaseFontSize',16);
-
 % OTHER PARAMETERS (passed as parameter-value pairs)
 % * 'NoPlot': A true/false value which, if true, no figure is created
 %   (defaut: false)
