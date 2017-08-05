@@ -28,9 +28,6 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 % * stats   : Additional statistics from the log rank test
 %
 
-p.addParameter('EventDefinition',[]);
-p.addParameter('FlipGroupOrder',0);
-p.addParameter('FlipColorOrder',0);
 p.addParameter('BaseFontSize',16);
 
 % OTHER PARAMETERS (passed as parameter-value pairs)
@@ -49,81 +46,22 @@ p.addParameter('BaseFontSize',16);
 % * 'GroupsToUse': Cell array defining what groups to use from the GroupVar
 %   variable. Works only if GrouVar is a cell array. (default: all groups are used)
 %
-% * 'GroupOrder': A cell array defning the group order to be used in the
+% * 'GroupOrder': A cell array defining the group order to be used in the
 %   legend. (default: Groups are sorted alphabetically)
 %
 % * 'EventDefinition': Two element cell array where the first cell defines
 %   the event and the second censored values. Example {'Dead,'Alive'}
 %   (default = true)
 %
-% * 'NaNColor': A 3-element [R G B] vector specifying the color used to display NaN
-%   or missing value. [0 0 0] corresponds to black and [1 1 1] to white. By
-%   default MATLAB displays NaN values using the color assigned to the
-%   lowest value in the colormap. Specifying this option automatically sets
-%   the 'UseFigureColormap' option to false because the color mapping must
-%   be computed prior to setting the nan color.
+% * 'FlipGroupOrder': Flips the order of the groups in the legend. 
+%   defaut: false)
 %
-% * 'MinColorValue': A scalar number corresponding to the value of the data
-%   that is mapped to the lowest color of the colormap. By default this is
-%   the minimum value of the matrix input.
+% * 'FlipColorOrder': Flips the color order of the groups. 
+%   defaut: false)
 %
-% * 'MaxColorValue': A scalar number corresponding to the value of the data
-%   that is mapped to the highest color of the colormap. By default this is
-%   the maximum value of the matrix input.
+% * 'BaseFontSize': Base fontsize for all text in the plot
+%   (Default: 16)
 %
-% * 'Parent': Handle to an axes object
-%
-% * 'TextColor': Either a color specification of all the text displayed on
-%   the image or a string 'xor' which sets the EraseMode property of the text
-%   objects to 'xor'. This will display all the text labels in a color that
-%   contrasts its background.
-%
-% * 'FontSize': The initial fontSize of the text labels on the image. As
-%   the image size is scaled the fontSize is shrunk appropriately.
-%
-% * 'ColorBar': Display colorbar. The corresponding value parameter should
-%   be either logical 1 or 0 or a cell array of any additional parameters
-%   you wish to pass to the colorbar function (such as location)
-%
-% * 'GridLines': Draw grid lines separating adjacent sections of the
-%   heatmap. The value of the parameter is a LineStyle specification, for example,
-%   :, -, -. or --. By default, no grid lines are drawn.
-%
-% * 'TickAngle': Angle of rotation of tick labels on x-axis. (Default: 0)
-%
-% * 'ShowAllTicks': Set to 1 or true to force all ticks and labels to be
-%   drawn. This can make the axes labels look crowded. (Default: false)
-%
-% * 'TickFontSize': Font size of the X and Y tick labels. Default value is
-%   the default axes font size, usually 10. Set to a lower value if many
-%   tick labels are being displayed
-%
-% * 'TickTexInterpreter': Set to 1 or true to render tick labels using a TEX
-%   interpreter. For example, '_b' and '^o' would be rendered as subscript
-%   b and the degree symbol with the TEX interpreter. This parameter is only
-%   available in MATLAB R2014b and above (Default: false)
-%
-% OUTPUTS:
-% * hImage: handle to the image object
-% * hText : handle to the text objects (empty if no text labels are drawn)
-% * hTick : handle to the X-tick label text objects if tick angle is not 0
-%           (empty otherwise)
-%
-% Notes:
-% * The 'money' colormap displays a colormap where 0 values are mapped to
-%   white, negative values displayed in varying shades of red and positive
-%   values in varying shades of green
-% * The 'red' colormap maps 0 values to white and higher values to red
-%
-% EXAMPLES:
-% data = reshape(sort(randi(100,10)),10,10)-50;
-% heatmap(data, cellstr(('A':'J')'), mean(data,2), '%0.0f%%',...
-%         'Colormap', 'money', 'Colorbar', true, 'GridLines', ':',...
-%         'TextColor', 'b')
-% For detailed examples, see the associated document heatmap_examples.m
-
-% Copyright The MathWorks, Inc. 2009-2014
-
 % *** Anders Berglund ***
 
 
