@@ -1,10 +1,15 @@
 # MatSurv
 Survival analysis in MATLAB
 USAGE:
+
   MatSurv(TimeVar, EventVar, GroupVar,'param', value, ...) creates a Kaplan-Meier plot
+  
   [p] = MatSurv( ... ) returns the log rank p-value
+  
   [p, fh] = MatSurv( ... ) returns both p-value and figure handle
+  
   [p, fh, stats] = MatSurv( ... ) returns additions stats from log rank test
+  
   [p, fh, stats] = MatSurv([], [], [], ... ) loads toy dataset
 
 INPUTS:
