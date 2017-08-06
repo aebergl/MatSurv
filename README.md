@@ -1,5 +1,6 @@
 # MatSurv
 Survival analysis in MATLAB
+
 USAGE:
 
   MatSurv(TimeVar, EventVar, GroupVar,'param', value, ...) creates a Kaplan-Meier plot
