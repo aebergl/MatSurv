@@ -1,15 +1,13 @@
 function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
-%MatSurv Survival analysis with Kaplan-Meier plot, log rank test and risk table
-%
-%
 % USAGE:
-% MatSurv(TimeVar, EventVar, GroupVar,'param', value, ...) creates a Kaplan-Meier plot
+%   MatSurv(TimeVar, EventVar, GroupVar,'param', value, ...) creates a Kaplan-Meier plot
 %   [p] = MatSurv( ... ) returns the log rank p-value
 %   [p, fh] = MatSurv( ... ) returns both p-value and figure handle
 %   [p, fh, stats] = MatSurv( ... ) returns additions stats from log rank test
+%   [p, fh, stats] = MatSurv([], [], [], ... ) loads toy dataset
 %
 % INPUTS:
-% * 'TimeVar' is a vector with numeric time to event values of events, either observed or
+% * 'TimeVar' is a vector with numeric time to event either observed or
 %   censored. Values equal or less than zero will be removed by default
 %
 % * 'EventVar' is a vector or cell array defining events or censored
@@ -18,9 +16,8 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 %   'Alive', 'Living', 'Not Relapsed', 'DiseaseFree', 'No' are considers as censored
 %   'EventDefinition' can be used to define other types of events
 %
-% * 'GroupVar' is a vector or cell array that defines the differnt groups.
-%   If it is continues variable median cut will be used as defining two
-%   groups by default. 
+% * 'GroupVar' is a vector or cell array that defines the different groups.
+%   If it is a continues variable median cut will be used as a default. 
 %
 % OUTPUTS:
 % * p       : log rank p-value
@@ -29,16 +26,16 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 %
 % OTHER PARAMETERS (passed as parameter-value pairs)
 % * 'NoPlot': A true/false value which, if true, no figure is created
-%   (defaut: false)
+%   (default: false)
 %
 % * 'CalcP': A true/false value which, if true, a log rank test is
-%   performed and diplayd on the KM-plot. (defaut: true)
+%   performed and displayed on the KM-plot. (default: true)
 %
 % * 'CutPoint': Either a string or scalar/vector with cut points to be used
-%   for defining groups baased on a continious 'GroupVar' input variable
+%   for defining groups based on a continuous 'GroupVar' input variable
 %   Allowed names are: 'Median' or 'Quartile'
 %   If a scalar or vector is used the groups will be defined based on the
-%   cut points. (defaut: 'median')
+%   cut points. (default: 'median')
 %
 % * 'GroupsToUse': Cell array defining what groups to use from the GroupVar
 %   variable. Works only if GrouVar is a cell array. (default: all groups are used)
@@ -51,61 +48,113 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 %   (default = true)
 %
 % * 'FlipGroupOrder': Flips the order of the groups in the legend. 
-%   defaut: false)
+%   default: false)
 %
 % * 'FlipColorOrder': Flips the color order of the groups. 
-%   (defaut: false)
+%   (default: false)
 %
-% * 'BaseFontSize': Base fontsize for all text in the plot
-%   (Default: 16)
+% * 'BaseFontSize': Base font size for all text in the plot
+%   (default: 16)
 %
-% * 'KM_position': Vector defning the KM axes for the KM plot
-%   (Default: [0.2 0.4 0.75 0.45])
+% * 'KM_position': Vector defining the KM axes for the KM plot
+%   (default: [0.2 0.4 0.75 0.45])
 %
 % * 'RT_position': Vector defining the Risk Table axes for the KM plot
-%   (Default: [0.2 0.05 0.75 0.20])
+%   (default: [0.2 0.05 0.75 0.20])
 %
 % KM plot options
-%
-% * 'Xstep': Scalar defining the X tick step length. 
-%   (defaut: automatic)
-%
-% * 'XTicks': BVector defning the oisition of the X tick marks
-%   (Default: 16)
-%
-% * 'XMinorTick': Scalar defning the number of minor ticks between major X
-%   ticks (Default: 1)
-%
 % * 'RT_position': Vector defining the Risk Table axes for the KM plot
-%   (Default: [0.2 0.05 0.75 0.20]
+%   (default: [0.2 0.05 0.75 0.20]
 %
-% * 'XLim': Vector defining the XLim.Do not affect the log rank test
-%   (defaut: automatic)
+% * 'XLim': Vector defining the XLim. Do not affects the log rank test
+%   (default: automatic)
 %
 % * 'LineColor': Either a matrix of size numLevels-by-3 representing the
 %   colormap to be used or a string for a MATLAB colormap
-%   (defaut: 'lines')
+%   (default: 'lines')
 %
-% * 'LineWidth': Scalar defining the linewith used in the KM-plot
+% * 'LineWidth': Scalar defining the line width used in the KM-plot
 %   (Default: 2)
 %
 % * 'LineStyle': Cell array defining the linestyle for the KM-plot. 
-%   If an array is given each group will have differbt linestyle, for example
+%   If an array is given each group will have different linestyle, for example
 %   'LineStyle',{'-','--',':','-.'}
 %   (Default: {'-'})
 %
 % * 'CensorLineWidth': Scalar defining the linewith of the censored ticks
-%   (defaut: 2)
+%   (default: 2)
 %
 % * 'CensorLineLength':Scalar defining the length of the censored ticks
 %   (Default: 0.02)
 %
-% * 'CensorLineColor': Cell array defining the linestyle for the KM-plot. 
-%   If an array is given each group will have different linestyle, for example
-%   'LineStyle',{'-','--',':','-.'}
+% * 'CensorLineColor': Text string defining color of censor ticks. 'same
+%   gives the same colors as the lines while 'k' would make them black
 %   (Default: 'same')
 %
+% * 'Xstep': Scalar defining the X tick step length. 
+%   (defaut: automatic)
+%
+% * 'XTicks': Vector defining the position of the X-tick marks
+%   (Default: 16)
+%
+% * 'XMinorTick': Scalar defining the number of minor ticks between major X
+%   ticks (Default: 1)
+%
+% * 'Xlabel': Text string for X-label (Default: 'Time(Months)' )
+%
+% * 'XlabelOptions': MATLAB Name-value pair arguments for xlabel (Default: '')
+%
+% * 'XLabelFontSize': Scalar describing Xlabel font size change compared 
+%   to base font size (Default: 0)
+%
+% * 'XTickFontSize': Scalar describing Xtick font size change compared 
+%   to base font size (Default: -2)
+%
+% * 'YTicks': Vector defining the position of the X-tick marks
+%   (Default: [0:0.2:1])
+%
+% * 'YMinorTick': Scalar defining the number of minor ticks between major Y
+%   ticks (Default: 1)
+%
+% * 'Ylabel': Text string for Y-label (Default: 'Survival Probability' )
+%
+% * 'YlabelOptions': MATLAB Name-value pair arguments for ylabel (Default: '')
+%
+% * 'YLabelFontSize': Scalar describing Ylabel font size change compared 
+%   to base font size (Default: 0)
+%
+% * 'YTickFontSize': Scalar describing Ytick font size change compared 
+%   to base font size (Default: -2)
+%
+% * 'Title': Text string for Title (Default: '' )
+%
+% * 'TitleOptions': MATLAB Name-value pair arguments for Title (Default: '')
+%
+% * 'LegendFontSize': Scalar describing Legend font size change compared 
+%   to base font size (Default: -2)
+%
+% * 'PvalFontSize': Scalar describing p-value font size change compared 
+%   to base font size (Default: 0)
+%
+% Risk table plot options
+% * 'RT_FontSize': Scalar describing Risk Table font size change compared 
+%   to base font size (Default: 0)
+%
+% * 'RT_Color': Text string defining color of Risk table text. 'same
+%   gives the same colors as the groups in the KM plot while 'k' would make
+%   them black (Default: 'same')
+%
+% * 'RT_Title': Text string for Risk Table Title (Default: '' )
+%
+% * 'RT_TitleOptions': MATLAB Name-value pair arguments for Risk Table Titel (Default: '')
+%
+% * 'RT_YLabel': True/False for displaying the group names on the Risk table 
+%   Y-axis (Default: True )
+%
+%   EXAMPLES:
+%
 % *** Anders Berglund ***
+
 
 
 % Check TimeVar, EventVar, GroupVar variables
@@ -223,17 +272,17 @@ if ~options.NoPlot
     axh_KM.YAxis.TickDirection = 'out';
     
     % Y label
-    axh_KM.YAxis.FontSize=options.YTickFontSize;
-    ylabel(axh_KM,options.Ylabel,'FontSize',options.YLabelFontSize,options.YlabelOptions{:});
+    axh_KM.YAxis.FontSize=options.BaseFontSize + options.YTickFontSize;
+    ylabel(axh_KM,options.Ylabel,'FontSize',options.BaseFontSize + options.YLabelFontSize,options.YlabelOptions{:});
     
     % X label
-    axh_KM.XAxis.FontSize=options.XTickFontSize;
+    axh_KM.XAxis.FontSize=options.BaseFontSize + options.XTickFontSize;
     if isempty(options.Xlabel)
         xlabel_str = sprintf('Time (%s)',options.TimeUnit);
     else
         xlabel_str =options.Xlabel;
     end
-    xlabel(axh_KM,xlabel_str,'FontSize',options.XLabelFontSize,options.XlabelOptions{:});
+    xlabel(axh_KM,xlabel_str,'FontSize',options.BaseFontSize + options.XLabelFontSize,options.XlabelOptions{:});
     axh_KM.XAxis.TickDirection = 'out';
     
     % Title
@@ -244,7 +293,7 @@ if ~options.NoPlot
     % Set legend
     h_LE=legend(S,[DATA.GROUPS(:).GroupName]);
     h_LE.Box='off';
-    h_LE.FontSize=options.LegendFontSize;
+    h_LE.FontSize=options.BaseFontSize + options.LegendFontSize;
     
     if ~isempty(options.XLim)
         axh_KM.XLim = [0 options.XLim];
@@ -269,7 +318,7 @@ if ~options.NoPlot
     
     if options.CalcP
         txt_str = sprintf('p = %.3g',p);
-        text(axh_KM,Nudge_X,0.1,txt_str,'FontSize',options.PvalFontSize,'tag','p-value')
+        text(axh_KM,Nudge_X,0.1,txt_str,'FontSize',options.BaseFontSize + options.PvalFontSize,'tag','p-value')
     end
     
     % And now to the Risk table
@@ -300,7 +349,7 @@ if ~options.NoPlot
             %sprintf('%u',RT_X(i,j))
             text(axh_RT,axh_RT.XTick(i),axh_RT.YTick(end-j+1),sprintf('%u',RT_X(i,j)),...
                 'HorizontalAlignment','center','VerticalAlignment','middle',...
-                'FontSize',options.RT_FontSize,'Color',cMAP_RT(j,:))
+                'FontSize',options.BaseFontSize + options.RT_FontSize,'Color',cMAP_RT(j,:))
         end
     end
     if options.RT_YLabel
@@ -311,7 +360,7 @@ if ~options.NoPlot
         for j = 1:DATA.numGroups
             text(axh_RT,left_pos-(nudge_x*2),axh_RT.YTick(end-j+1),DATA.GROUPS(j).GroupName,...
                 'HorizontalAlignment','right','VerticalAlignment','middle',...
-                'FontSize',options.RT_FontSize,'Color',cMAP_RT(j,:),'FontWeight','bold')
+                'FontSize',options.BaseFontSize + options.RT_FontSize,'Color',cMAP_RT(j,:),'FontWeight','bold')
         end
     end
     % Title
@@ -373,23 +422,23 @@ p.addParameter('CensorLineColor','same');
 
 p.addParameter('Xlabel',[]);
 p.addParameter('XlabelOptions',cell(0,0));
-p.addParameter('XLabelFontSize',16);
-p.addParameter('XTickFontSize',14);
+p.addParameter('XLabelFontSize',0);
+p.addParameter('XTickFontSize',-2);
 
 p.addParameter('Ylabel','Survival Probability');
 p.addParameter('YlabelOptions',cell(0,0));
-p.addParameter('YLabelFontSize',16);
-p.addParameter('YTickFontSize',14);
+p.addParameter('YLabelFontSize',0);
+p.addParameter('YTickFontSize',-2);
 p.addParameter('YTick',0:0.2:1);
 p.addParameter('YMinorTick',1);
 
 p.addParameter('Title',[]);
 p.addParameter('TitleOptions',cell(0,0));
-p.addParameter('LegendFontSize',14);
-p.addParameter('PvalFontSize',16);
+p.addParameter('LegendFontSize',-2);
+p.addParameter('PvalFontSize',0);
 
 % Risk table plot options
-p.addParameter('RT_FontSize',16);
+p.addParameter('RT_FontSize',0);
 p.addParameter('RT_Color','same');
 p.addParameter('RT_YLabel',1);
 p.addParameter('RT_Title',[]);
