@@ -1,23 +1,25 @@
 function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 % USAGE:
-%   MatSurv(TimeVar, EventVar, GroupVar,'param', value, ...) creates a Kaplan-Meier plot
+%   MatSurv(TimeVar, EventVar, GroupVar,'param', value, ...) creates a Kaplan-Meier plot,
+%   a risk table and calculates a log rank p-value
+%
 %   [p] = MatSurv( ... ) returns the log rank p-value
 %   [p, fh] = MatSurv( ... ) returns both p-value and figure handle
 %   [p, fh, stats] = MatSurv( ... ) returns additions stats from log rank test
 %   [p, fh, stats] = MatSurv([], [], [], ... ) loads toy dataset
 %
 % INPUTS:
-% * 'TimeVar' is a vector with numeric time to event either observed or
+% * 'TimeVar' is a vector with numeric time to event, either observed or
 %   censored. Values equal or less than zero will be removed by default
 %
 % * 'EventVar' is a vector or cell array defining events or censored
 %   observation. Events are defined with a 1 and censored point with a 0. By
-%   default 'Dead', 'Deceased', 'Relapsed', 'Yes' are considered as events. 
+%   default 'Dead', 'Deceased', 'Relapsed', 'Yes' are considered as events.
 %   'Alive', 'Living', 'Not Relapsed', 'DiseaseFree', 'No' are considers as censored
 %   'EventDefinition' can be used to define other types of events
 %
-% * 'GroupVar' is a vector or cell array that defines the different groups.
-%   If it is a continues variable median cut will be used as a default. 
+% * 'GroupVar' is a vector or cell array defining the different groups.
+%   If it is a continues variable median cut will be used as a default.
 %
 % OUTPUTS:
 % * p       : log rank p-value
@@ -34,7 +36,7 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 % * 'CutPoint': Either a string or scalar/vector with cut points to be used
 %   for defining groups based on a continuous 'GroupVar' input variable
 %   Allowed names are: 'Median' or 'Quartile'
-%   If a scalar or vector is used the groups will be defined based on the
+%   If a scalar or vector is given the groups will be defined based on the
 %   cut points. (default: 'median')
 %
 % * 'GroupsToUse': Cell array defining what groups to use from the GroupVar
@@ -45,12 +47,11 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 %
 % * 'EventDefinition': Two element cell array where the first cell defines
 %   the event and the second censored values. Example {'Dead,'Alive'}
-%   (default = true)
 %
-% * 'FlipGroupOrder': Flips the order of the groups in the legend. 
-%   default: false)
+% * 'FlipGroupOrder': Flips the order of the groups in the legend.
+%   (default: false)
 %
-% * 'FlipColorOrder': Flips the color order of the groups. 
+% * 'FlipColorOrder': Flips the color order of the groups.
 %   (default: false)
 %
 % * 'BaseFontSize': Base font size for all text in the plot
@@ -63,10 +64,7 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 %   (default: [0.2 0.05 0.75 0.20])
 %
 % KM plot options
-% * 'RT_position': Vector defining the Risk Table axes for the KM plot
-%   (default: [0.2 0.05 0.75 0.20]
-%
-% * 'XLim': Vector defining the XLim. Do not affects the log rank test
+% * 'XLim': Vector defining the XLim. Do not affect the log rank test
 %   (default: automatic)
 %
 % * 'LineColor': Either a matrix of size numLevels-by-3 representing the
@@ -76,7 +74,7 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 % * 'LineWidth': Scalar defining the line width used in the KM-plot
 %   (Default: 2)
 %
-% * 'LineStyle': Cell array defining the linestyle for the KM-plot. 
+% * 'LineStyle': Cell array defining the linestyle for the KM-plot.
 %   If an array is given each group will have different linestyle, for example
 %   'LineStyle',{'-','--',':','-.'}
 %   (Default: {'-'})
@@ -84,18 +82,18 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 % * 'CensorLineWidth': Scalar defining the linewith of the censored ticks
 %   (default: 2)
 %
-% * 'CensorLineLength':Scalar defining the length of the censored ticks
+% * 'CensorLineLength': Scalar defining the length of the censored ticks
 %   (Default: 0.02)
 %
 % * 'CensorLineColor': Text string defining color of censor ticks. 'same
 %   gives the same colors as the lines while 'k' would make them black
 %   (Default: 'same')
 %
-% * 'Xstep': Scalar defining the X tick step length. 
+% * 'Xstep': Scalar defining the X tick step length.
 %   (defaut: automatic)
 %
 % * 'XTicks': Vector defining the position of the X-tick marks
-%   (Default: 16)
+%   (Default: automatic)
 %
 % * 'XMinorTick': Scalar defining the number of minor ticks between major X
 %   ticks (Default: 1)
@@ -104,10 +102,10 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 %
 % * 'XlabelOptions': MATLAB Name-value pair arguments for xlabel (Default: '')
 %
-% * 'XLabelFontSize': Scalar describing Xlabel font size change compared 
+% * 'XLabelFontSize': Scalar describing Xlabel font size change compared
 %   to base font size (Default: 0)
 %
-% * 'XTickFontSize': Scalar describing Xtick font size change compared 
+% * 'XTickFontSize': Scalar describing Xtick font size change compared
 %   to base font size (Default: -2)
 %
 % * 'YTicks': Vector defining the position of the X-tick marks
@@ -120,24 +118,24 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 %
 % * 'YlabelOptions': MATLAB Name-value pair arguments for ylabel (Default: '')
 %
-% * 'YLabelFontSize': Scalar describing Ylabel font size change compared 
+% * 'YLabelFontSize': Scalar describing Ylabel font size change compared
 %   to base font size (Default: 0)
 %
-% * 'YTickFontSize': Scalar describing Ytick font size change compared 
+% * 'YTickFontSize': Scalar describing Ytick font size change compared
 %   to base font size (Default: -2)
 %
 % * 'Title': Text string for Title (Default: '' )
 %
 % * 'TitleOptions': MATLAB Name-value pair arguments for Title (Default: '')
 %
-% * 'LegendFontSize': Scalar describing Legend font size change compared 
+% * 'LegendFontSize': Scalar describing Legend font size change compared
 %   to base font size (Default: -2)
 %
-% * 'PvalFontSize': Scalar describing p-value font size change compared 
+% * 'PvalFontSize': Scalar describing p-value font size change compared
 %   to base font size (Default: 0)
 %
 % Risk table plot options
-% * 'RT_FontSize': Scalar describing Risk Table font size change compared 
+% * 'RT_FontSize': Scalar describing Risk Table font size change compared
 %   to base font size (Default: 0)
 %
 % * 'RT_Color': Text string defining color of Risk table text. 'same
@@ -148,13 +146,16 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 %
 % * 'RT_TitleOptions': MATLAB Name-value pair arguments for Risk Table Titel (Default: '')
 %
-% * 'RT_YLabel': True/False for displaying the group names on the Risk table 
+% * 'RT_YLabel': True/False for displaying the group names on the Risk table
 %   Y-axis (Default: True )
 %
 %   EXAMPLES:
+%   [p,fh,stats] = MatSurv([], [], [],'Xstep',4,'Title','MatSurv KM-Plot','FlipColor',1,'XMinorTick',3);
+%
+%
+% MatSurv do NOT use any toolboxes
 %
 % *** Anders Berglund ***
-
 
 
 % Check TimeVar, EventVar, GroupVar variables
@@ -233,6 +234,7 @@ if ~options.NoPlot
     if options.FlipColorOrder
         cMAP = flipud(cMAP);
     end
+    
     % Adjust line style
     if ischar(options.LineStyle)
         LineStyles = cell(DATA.numGroups,1);
@@ -243,6 +245,7 @@ if ~options.NoPlot
     elseif iscell(options.LineStyle)
         LineStyles = options.LineStyle;
     end
+    
     % Adjust censoring markers
     if ischar(options.CensorLineColor) && strcmpi('same',options.CensorLineColor)
         cMAPCensor = cMAP;
@@ -263,7 +266,7 @@ if ~options.NoPlot
     end
     
     %Fix Y-Axis
-    % Limir range from 0 to 1
+    % Limit range from 0 to 1
     axh_KM.YLim = [0 1];
     axh_KM.YTick = options.YTick;
     YMinorStep =  (options.YTick(2) - options.YTick(1) ) / (1+options.YMinorTick);
@@ -280,7 +283,7 @@ if ~options.NoPlot
     if isempty(options.Xlabel)
         xlabel_str = sprintf('Time (%s)',options.TimeUnit);
     else
-        xlabel_str =options.Xlabel;
+        xlabel_str = options.Xlabel;
     end
     xlabel(axh_KM,xlabel_str,'FontSize',options.BaseFontSize + options.XLabelFontSize,options.XlabelOptions{:});
     axh_KM.XAxis.TickDirection = 'out';
@@ -295,12 +298,11 @@ if ~options.NoPlot
     h_LE.Box='off';
     h_LE.FontSize=options.BaseFontSize + options.LegendFontSize;
     
+    % Get Xticks
     if ~isempty(options.XLim)
         axh_KM.XLim = [0 options.XLim];
     end
     
-    % Get Xticks
-    %max_X = max(max(DATA.GROUPS.TimeVar));
     max_X = axh_KM.XLim(2);
     Nudge_X = max_X / 50;
     
@@ -352,8 +354,10 @@ if ~options.NoPlot
                 'FontSize',options.BaseFontSize + options.RT_FontSize,'Color',cMAP_RT(j,:))
         end
     end
+    
+    %Set Y label for risk table
     if options.RT_YLabel
-        left_pos = axh_RT.Children(end).Extent(1);
+        left_pos = axh_RT.Children(end).Extent(1); % Get left most position for text
         nudge_x = abs(axh_RT.XLim(2) - axh_RT.XLim(1))/100;
         
         line(axh_RT,[left_pos-nudge_x left_pos-nudge_x],[axh_RT.YTick(1)-0.5 axh_RT.YTick(end)+0.5],'color','k','clipping','off','LineWidth',1.25)
@@ -372,6 +376,7 @@ else
     fh = [];
 end
 
+% Define output variables dependent of varargout
 if nargout > 0
     varargout{1} = p;
 end
@@ -466,7 +471,7 @@ ef = zeros(n,DATA.numGroups-1);
 
 % Assign values
 for i = 1:DATA.numGroups
-    % Need to add time entries including censored ones
+    % Need to add censored time entries for group i
     tf_in = unique([tf;DATA.GROUPS(i).TimeVar]);
     [KM_Events, ~, ~] = MatSurvCalculateTables(tf_in,DATA.GROUPS(i).TimeVar,DATA.GROUPS(i).EventVar,tf);
     nf(:,i) = KM_Events(:,2);
@@ -474,20 +479,27 @@ for i = 1:DATA.numGroups
     
 end
 
+% Calculate sums over all groups
 nf_sum = sum(nf,2);
 mf_sum = sum(mf,2);
+
+% Calculated expected values
 for i = 1:DATA.numGroups-1
     ef(:,i) = (nf(:,i)  ./ nf_sum) .* mf_sum;
 end
 d = sum(mf(:,1:end-1)-ef)';
+
+%Calculate Variance
 Var_OE=zeros(n,DATA.numGroups-1);
 for i = 1:DATA.numGroups-1
     Var_OE(:,i) = (nf(:,i) .* (nf_sum - nf(:,i)) .* mf_sum .*(nf_sum - mf_sum)) ./ (nf_sum.^2 .* (nf_sum -1));
     %Var_OE(:,i) = (nf(:,i) .* (nf_sum - nf(:,i)) .* mf(:,i) .*(nf_sum - mf_sum)) ./ (nf_sum.^2 .* (nf_sum -1));
 end
 Var_OE_sum =sum(Var_OE);
+
+%Calculate covariance
 Cov_OE = zeros(n,(DATA.numGroups-1)*(DATA.numGroups-2)/2);
-if DATA.numGroups > 2
+if DATA.numGroups > 2 % If there are more than 2 groups
     counter = 0;
     for i = 1:DATA.numGroups-2
         for j = i+1:DATA.numGroups-1
@@ -495,35 +507,20 @@ if DATA.numGroups > 2
             Cov_OE(:,counter) = ( -nf(:,i) .* nf(:,j) .* mf_sum .* (nf_sum - mf_sum)) ./ (nf_sum.^2 .* (nf_sum -1));
         end
     end
-
+    
     Cov_OE_sum = sum(Cov_OE);
     V = zeros(DATA.numGroups-1);
     V(tril(true(DATA.numGroups-1),-1))=Cov_OE_sum;
     V(~tril(true(DATA.numGroups-1),0))=Cov_OE_sum;
     V(1:size(V,1)+1:end) = Var_OE_sum;
-else
+    
+else % Special case for 2 groups
     V = Var_OE_sum;
 end
 LogRank_Stat = d'/V*d;
 p = 1 - gammainc(LogRank_Stat/2,(DATA.numGroups-1)/2);
 stats.Chi2 = LogRank_Stat;
 
-% elseif DATA.numGroups ==2
-%     ef = zeros(n,DATA.numGroups);
-%
-%     npn = nf(:,1) + nf(:,2);
-%     mpm = mf(:,1) + mf(:,2);
-%     ntn = nf(:,1) .* nf(:,2);
-%     for i = 1:DATA.numGroups
-%         ef(:,i) = (nf(:,i)  ./ npn) .* mpm;
-%     end
-%     O_E = mf-ef;
-%     sum_OE = sum(O_E)
-%     Var_O_E = (ntn .* mpm .* (npn - mpm)) ./ ( npn.^2 .* (npn - 1));
-%     sum_Var_O_E =sum(Var_O_E)
-%     LogRank_Stat = sum_OE(1)^2/sum_Var_O_E
-%     p = 1-chi2cdf(LogRank_Stat,1);
-% end
 end
 
 
@@ -613,6 +610,7 @@ elseif iscell(GroupVar)
         DATA.GROUPS(i).TimeVar = TimeVar(indx_group);
         DATA.GROUPS(i).EventVar = EventVarBin(indx_group);
     end
+    
     % If the Groupvariable is a numerical vector
 elseif (strcmpi('Median',options.CutPoint) || isscalar(options.CutPoint)) && isnumeric(GroupVar)
     if strcmpi('Median',options.CutPoint)
@@ -646,6 +644,30 @@ elseif strcmpi('Quartile',options.CutPoint)  && isnumeric(GroupVar)
     DATA.GROUPS(2).GroupName = {sprintf('%s <= %g',tmp_txt,Cut_Val)};
     DATA.GROUPS(2).TimeVar = TimeVar(indx_Below);
     DATA.GROUPS(2).EventVar = EventVarBin(indx_Below);
+
+    % Vector with several cut pints 
+elseif (isvector(options.CutPoint)) && isnumeric(GroupVar)
+    CutPointSorted = sort(options.CutPoint,'descend');
+    DATA.numGroups = length(CutPointSorted) + 1;
+    
+    % For points above
+    indx_Above  = (GroupVar > CutPointSorted(1));
+    DATA.GROUPS(1).GroupName = {sprintf('Fixed Value > %g',CutPointSorted(1))};
+    DATA.GROUPS(1).TimeVar = TimeVar(indx_Above);
+    DATA.GROUPS(1).EventVar = EventVarBin(indx_Above);
+    for i = 1:length(CutPointSorted) - 1
+        indx  = (GroupVar > CutPointSorted(i+1) && GroupVar <= CutPointSorted(i));
+        DATA.GROUPS(i+1).GroupName = {sprintf('Fixed Value > %g, <= %g',CutPointSorted(i+1),CutPointSorted(i))};
+        DATA.GROUPS(i+1).TimeVar = TimeVar(indx);
+        DATA.GROUPS(i+1).EventVar = EventVarBin(indx);
+    end
+    i = i + 1;
+    indx  =  (GroupVar <= CutPointSorted(i));
+    DATA.GROUPS(i).GroupName = {sprintf('Fixed Value <= %g',CutPointSorted(i))};
+    DATA.GROUPS(i).TimeVar = TimeVar(indx);
+    DATA.GROUPS(i).EventVar = EventVarBin(indx);
+    
+    
 end
 
 end
@@ -694,9 +716,9 @@ end
 
 function [TimeVar, EventVar, GroupVar] = MatSurvCleanData(TimeVar, EventVar, GroupVar, options)
 % Functions to check and cleanup inout data
-%
-% Make sure that TimeVar, EventVar, GroupVar are column vectors and not row
-% vectors
+
+% Make sure that TimeVar, EventVar, GroupVar are all column vectors 
+% and not row vectors
 if size(TimeVar,1) == 1
     TimeVar = TimeVar';
 end
@@ -706,7 +728,6 @@ end
 if size(GroupVar,1) == 1
     GroupVar = GroupVar';
 end
-
 
 % Check time variable for missing data and timepoints < TimeMin
 rem_indx_time = ( isnan(TimeVar) | (TimeVar <= options.TimeMin) );
@@ -726,7 +747,6 @@ elseif iscell(GroupVar)
 end
 
 % Merge all indexes
-
 rem_indx = (rem_indx_time | rem_indx_event |rem_indx_group);
 
 if sum(rem_indx) > 0
@@ -737,13 +757,12 @@ if sum(rem_indx) > 0
         fprintf('*********************************\n');
         fprintf('\n');
         fprintf('%u sample have been removed',sum(rem_indx));
-        fprintf('removed samples had missind data or time < %g\n',options.TimeMin)
+        fprintf('removed samples had missing data or time < %g\n',options.TimeMin)
     end
     
 end
 
 numEvenTypes = unique(EventVar);
-
 if numEvenTypes > 2
     error('More then 2 event types in the Event variable');
 end
