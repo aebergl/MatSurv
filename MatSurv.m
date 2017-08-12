@@ -58,10 +58,10 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 %   (default: 16)
 %
 % * 'KM_position': Vector defining the KM axes for the KM plot
-%   (default: [0.2 0.4 0.75 0.45])
+%   (default: [0.3 0.4 0.68 0.45])
 %
 % * 'RT_position': Vector defining the Risk Table axes for the KM plot
-%   (default: [0.2 0.05 0.75 0.20])
+%   (default: [0.3 0.05 0.68 0.20])
 %
 % KM plot options
 % * 'XLim': Vector defining the XLim. Do not affect the log rank test
@@ -409,8 +409,8 @@ p.addParameter('TimeMax',[], @(x)isnumeric(x) && isscalar(x));
 p.addParameter('TimeUnit','Months');
 
 % Figure Options
-p.addParameter('KM_position',[0.2 0.4 0.75 0.45]);
-p.addParameter('RT_position',[0.2 0.05 0.75 0.20]);
+p.addParameter('KM_position',[0.25 0.4 0.70 0.45]);
+p.addParameter('RT_position',[0.25 0.05 0.70 0.20]);
 
 % KM plot options
 p.addParameter('Xstep',[], @(x)isnumeric(x) && isscalar(x));
@@ -495,6 +495,7 @@ for i = 1:DATA.numGroups-1
     Var_OE(:,i) = (nf(:,i) .* (nf_sum - nf(:,i)) .* mf_sum .*(nf_sum - mf_sum)) ./ (nf_sum.^2 .* (nf_sum -1));
     %Var_OE(:,i) = (nf(:,i) .* (nf_sum - nf(:,i)) .* mf(:,i) .*(nf_sum - mf_sum)) ./ (nf_sum.^2 .* (nf_sum -1));
 end
+Var_OE(isnan(Var_OE)) = 0;
 Var_OE_sum =sum(Var_OE);
 
 %Calculate covariance
@@ -507,7 +508,7 @@ if DATA.numGroups > 2 % If there are more than 2 groups
             Cov_OE(:,counter) = ( -nf(:,i) .* nf(:,j) .* mf_sum .* (nf_sum - mf_sum)) ./ (nf_sum.^2 .* (nf_sum -1));
         end
     end
-    
+    Cov_OE(isnan(Cov_OE)) = 0;
     Cov_OE_sum = sum(Cov_OE);
     V = zeros(DATA.numGroups-1);
     V(tril(true(DATA.numGroups-1),-1))=Cov_OE_sum;
@@ -673,10 +674,9 @@ end
 end
 
 function [TimeVar, EventVarBin] = MatSurvCensorTimeMax(TimeVar, EventVarBin, options)
-indx_TimeMax = (TimeVar > options.TimeMax);
-TimeVar(indx_TimeMax) = TimeMax;
-EventVarBin(indx_TimeMax) = 0;
-
+    indx_TimeMax = (TimeVar > options.TimeMax);
+    TimeVar(indx_TimeMax) = options.TimeMax;
+    EventVarBin(indx_TimeMax) = 0;
 end
 
 function [EventVarBin] = MatSurvDefineEventVar(EventVar, options)
