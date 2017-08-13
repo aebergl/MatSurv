@@ -6,7 +6,7 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 %   [p] = MatSurv( ... ) returns the log rank p-value
 %   [p, fh] = MatSurv( ... ) returns both p-value and figure handle
 %   [p, fh, stats] = MatSurv( ... ) returns additions stats from log rank test
-%   [p, fh, stats] = MatSurv([], [], [], ... ) loads toy dataset
+%   [p, fh, stats] = MatSurv([], [], [], ... ) loads test dataset
 %
 % INPUTS:
 % * 'TimeVar' is a vector with numeric time to event, either observed or
@@ -30,9 +30,6 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 % * 'NoPlot': A true/false value which, if true, no figure is created
 %   (default: false)
 %
-% * 'CalcP': A true/false value which, if true, a log rank test is
-%   performed and displayed on the KM-plot. (default: true)
-%
 % * 'CutPoint': Either a string or scalar/vector with cut points to be used
 %   for defining groups based on a continuous 'GroupVar' input variable
 %   Allowed names are: 'Median' or 'Quartile'
@@ -48,14 +45,27 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 % * 'EventDefinition': Two element cell array where the first cell defines
 %   the event and the second censored values. Example {'Dead,'Alive'}
 %
+% * 'TimeMin': Scalar defining minimum valid time point. Subjects with time
+%   values below this will be removed. (default: 0)
+%
+% * 'TimeMAx': Scalar value defining righ censoring time. Subjects with
+%   TimeVar > TimeMax will be set to TimeMax and considered as censored.
+%   (default: [])
+%
+% * 'PairWiseP': A true/false for caulculating pairwise log rank test
+%   between group pairs, useful if there is more than two groups. (default: false)
+%
+% * 'TimeUnit': String defning time unit displayd on the x-axis. 
+%   (default: 'Months')
+%
+% * 'NoWarnings': A true/false value which, if true, no warnings are printed 
+%   id subjects are removed. (default: false)
+%
 % * 'FlipGroupOrder': Flips the order of the groups in the legend.
 %   (default: false)
 %
 % * 'FlipColorOrder': Flips the color order of the groups.
 %   (default: false)
-%
-% * 'BaseFontSize': Base font size for all text in the plot
-%   (default: 16)
 %
 % * 'KM_position': Vector defining the KM axes for the KM plot
 %   (default: [0.3 0.4 0.68 0.45])
@@ -63,7 +73,19 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 % * 'RT_position': Vector defining the Risk Table axes for the KM plot
 %   (default: [0.3 0.05 0.68 0.20])
 %
+% * 'BaseFontSize': Base font size for all text in the plot
+%   (default: 16)
+%
 % KM plot options
+% * 'DispP': A true/false value which, if true, log rank test p-value
+%   is displayed on the KM-plot. (default: true)
+%
+% * 'DispHR': A true/false value which, if true, Hazard ration (HR)
+%   is displayed on the KM-plot. (default: true)
+%
+% * 'InvHR': A true/false value which, if true, the iverted HR value
+%   is displayed on the KM-plot. (default: false)
+%
 % * 'XLim': Vector defining the XLim. Do not affect the log rank test
 %   (default: automatic)
 %
@@ -155,6 +177,8 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 %
 % MatSurv do NOT use any toolboxes
 %
+%   More examples can be found at: https://github.com/aebergl/MatSurv 
+%
 % *** Anders Berglund ***
 
 
@@ -195,7 +219,7 @@ if ~isempty(options.TimeMax)
 end
 
 % CreatGroups based on GroupVar and create DATA structure
-[DATA] = MatSurvCreateGroups(TimeVar, EventVarBin, GroupVar, options);
+[DATA,options] = MatSurvCreateGroups(TimeVar, EventVarBin, GroupVar, options);
 
 % Flip Group Ordering
 if options.FlipGroupOrder
@@ -206,11 +230,22 @@ end
 [DATA] = MatSurvCreateTable(DATA);
 
 % Do log rank test
-if options.CalcP
-    [p,stats] = MatSurvLogRank(DATA);
-else
-    p=[];
-    stats=[];
+[p,stats] = MatSurvLogRank(DATA);
+
+if options.PairWiseP
+    counter = 0;
+    stats.ParwiseName = cell(DATA.numGroups * (DATA.numGroups - 1) / 2,1);
+    for i = 1:DATA.numGroups - 1
+        for j = i+1:DATA.numGroups
+            counter  = counter + 1;
+            DATA_tmp.numGroups = 2;
+            DATA_tmp.GROUPS(1) = DATA.GROUPS(i);
+            DATA_tmp.GROUPS(2) = DATA.GROUPS(j);
+            [~,stats.ParwiseStats(counter)] = MatSurvLogRank(DATA_tmp);
+            stats.ParwiseName{counter} = sprintf('%s vs. %s',DATA.GROUPS(i).GroupName{1},DATA.GROUPS(j).GroupName{1});
+        end
+    end
+    
 end
 
 if ~options.NoPlot
@@ -318,8 +353,15 @@ if ~options.NoPlot
     axh_KM.XAxis.MinorTickValues = XMinorStep:XMinorStep:axh_KM.XTick(end);
     axh_KM.LineWidth = 1.5;
     
-    if options.CalcP
-        txt_str = sprintf('p = %.3g',p);
+    if options.DispP
+        txt_str(1) = {sprintf('p = %.3g',p)};
+        if options.DispHR
+            if options.InvHR
+                txt_str(2) = {sprintf('HR = %.3g (%.3g - %.3g)',stats.HR_Inv,stats.low95_Inv, stats.up95_Inv)};
+            else
+                txt_str(2) = {sprintf('HR = %.3g (%.3g - %.3g)',stats.HR,stats.low95, stats.up95)};
+            end
+        end
         text(axh_KM,Nudge_X,0.1,txt_str,'FontSize',options.BaseFontSize + options.PvalFontSize,'tag','p-value')
     end
     
@@ -394,25 +436,28 @@ function params = MatSurvParseInput(varargin)
 %Parse input and set defualt values
 p = inputParser;
 p.addParameter('NoPlot',false);
-p.addParameter('CalcP',1);
 p.addParameter('CutPoint','Median');
 p.addParameter('GroupOrder',[]);
 p.addParameter('GroupsToUse',[]);
 p.addParameter('EventDefinition',[]);
-p.addParameter('FlipGroupOrder',0);
-p.addParameter('FlipColorOrder',0);
-p.addParameter('BaseFontSize',16);
-
-p.addParameter('NoWarnings',false);
 p.addParameter('TimeMin',0, @(x)isnumeric(x) && isscalar(x));
 p.addParameter('TimeMax',[], @(x)isnumeric(x) && isscalar(x));
+p.addParameter('FlipGroupOrder',0);
+p.addParameter('FlipColorOrder',0);
+p.addParameter('NoWarnings',false);
 p.addParameter('TimeUnit','Months');
+p.addParameter('PairWiseP',0);
 
 % Figure Options
 p.addParameter('KM_position',[0.25 0.4 0.70 0.45]);
 p.addParameter('RT_position',[0.25 0.05 0.70 0.20]);
+p.addParameter('BaseFontSize',16);
+
 
 % KM plot options
+p.addParameter('DispP',1);
+p.addParameter('DispHR',1);
+p.addParameter('InvHR',0);
 p.addParameter('Xstep',[], @(x)isnumeric(x) && isscalar(x));
 p.addParameter('XTicks',[], @(x)isnumeric(x) && isvector(x));
 p.addParameter('XMinorTick',1, @(x)isnumeric(x) && isscalar(x));
@@ -465,9 +510,9 @@ tf = unique(tf);
 
 % allocate matrices
 n = length(tf);
-mf = zeros(n,DATA.numGroups);
-nf = zeros(n,DATA.numGroups);
-ef = zeros(n,DATA.numGroups-1);
+mf = zeros(n,DATA.numGroups); % Observed failures
+nf = zeros(n,DATA.numGroups); % Number at risk
+ef = zeros(n,DATA.numGroups); % Expected number of failures
 
 % Assign values
 for i = 1:DATA.numGroups
@@ -476,7 +521,6 @@ for i = 1:DATA.numGroups
     [KM_Events, ~, ~] = MatSurvCalculateTables(tf_in,DATA.GROUPS(i).TimeVar,DATA.GROUPS(i).EventVar,tf);
     nf(:,i) = KM_Events(:,2);
     mf(:,i) = KM_Events(:,3);
-    
 end
 
 % Calculate sums over all groups
@@ -484,10 +528,22 @@ nf_sum = sum(nf,2);
 mf_sum = sum(mf,2);
 
 % Calculated expected values
-for i = 1:DATA.numGroups-1
+for i = 1:DATA.numGroups
     ef(:,i) = (nf(:,i)  ./ nf_sum) .* mf_sum;
 end
-d = sum(mf(:,1:end-1)-ef)';
+%[tf mf nf ef]
+
+d = sum(mf(:,1:end-1)-ef(:,1:end-1))';
+
+% Caclulate Hazard Ratio
+if DATA.numGroups == 2
+    stats.HR = (sum(mf(:,1)) / sum(ef(:,1))) / (sum(mf(:,2)) / sum(ef(:,2)));
+    stats.low95 = exp((log(stats.HR) - 1.96 * sqrt(1/sum(ef(:,1)) + 1/sum(ef(:,2)))));
+    stats.up95 = exp((log(stats.HR) + 1.96 * sqrt(1/sum(ef(:,1)) + 1/sum(ef(:,2)))));
+    stats.HR_Inv = 1/stats.HR;
+    stats.up95_Inv = 1/stats.up95;
+    stats.low95_Inv = 1/stats.low95;
+end
 
 %Calculate Variance
 Var_OE=zeros(n,DATA.numGroups-1);
@@ -518,12 +574,13 @@ if DATA.numGroups > 2 % If there are more than 2 groups
 else % Special case for 2 groups
     V = Var_OE_sum;
 end
-LogRank_Stat = d'/V*d;
-p = 1 - gammainc(LogRank_Stat/2,(DATA.numGroups-1)/2);
-stats.Chi2 = LogRank_Stat;
+
+%Calculate Chi2 
+stats.Chi2 = d'/V*d;
+p = 1 - gammainc(stats.Chi2/2,(DATA.numGroups-1)/2);
+stats.p = p;
 
 end
-
 
 function [DATA] = MatSurvCreateTable(DATA)
 
@@ -581,7 +638,7 @@ KM_ALL = [tf S nf];
 Censored_Points=[tf(indx_censored) S(indx_censored)];
 
 end
-function [DATA] = MatSurvCreateGroups(TimeVar, EventVarBin, GroupVar, options)
+function [DATA,options] = MatSurvCreateGroups(TimeVar, EventVarBin, GroupVar, options)
 % Create Group structure
 DATA.numGroups = 0;
 DATA.GROUPS = struct('GroupName',{},'TimeVar',[],'EventVar',[]);
@@ -669,6 +726,13 @@ elseif (isvector(options.CutPoint)) && isnumeric(GroupVar)
     DATA.GROUPS(i).EventVar = EventVarBin(indx);
     
     
+end
+
+% Hazard ration can only be calculated if there is two groups
+
+if DATA.numGroups ~= 2
+    options.DispHR = 0;
+    options.CalcHR = 0;
 end
 
 end
@@ -769,9 +833,8 @@ end
 
 end
 
-
-
 function [TimeVar, EventVar, GroupVar] = SurvMatLoadTestData
+% Test example taken from "Freireich, EJ et al. 1963, Blood, 21, 699-716)"
 
 t1=[6 6 6 7 10 13 16 22 23 6 9 10 11 17 19 20 25 32 32 34 35]';
 t2=[1 1 2 2 3 4 4 5 5 8 8 8 8 11 11 12 12 15 17 22 23]';
