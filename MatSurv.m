@@ -30,6 +30,9 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 % * 'NoPlot': A true/false value which, if true, no figure is created
 %   (default: false)
 %
+% * 'NoRiskTable': A true/false value which, if true, no risk table is
+%   included in the KM-plot. (default: false)
+%
 % * 'CutPoint': Either a string or scalar/vector with cut points to be used
 %   for defining groups based on a continuous 'GroupVar' input variable
 %   Allowed names are: 'Median' or 'Quartile'
@@ -55,12 +58,10 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 % * 'PairWiseP': A true/false for caulculating pairwise log rank test
 %   between group pairs, useful if there is more than two groups. (default: false)
 %
-% * 'TimeUnit': String defning time unit displayd on the x-axis. 
-%   (default: 'Months')
-%
-% * 'NoWarnings': A true/false value which, if true, no warnings are printed 
+% * 'NoWarnings': A true/false value which, if true, no warnings are printed
 %   id subjects are removed. (default: false)
 %
+% KM plot options
 % * 'FlipGroupOrder': Flips the order of the groups in the legend.
 %   (default: false)
 %
@@ -73,10 +74,12 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 % * 'RT_position': Vector defining the Risk Table axes for the KM plot
 %   (default: [0.3 0.05 0.68 0.20])
 %
+% * 'TimeUnit': String defning time unit displayd on the x-axis.
+%   (default: 'Months')
+%
 % * 'BaseFontSize': Base font size for all text in the plot
 %   (default: 16)
 %
-% KM plot options
 % * 'DispP': A true/false value which, if true, log rank test p-value
 %   is displayed on the KM-plot. (default: true)
 %
@@ -177,7 +180,7 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 %
 % MatSurv do NOT use any toolboxes
 %
-%   More examples can be found at: https://github.com/aebergl/MatSurv 
+%   More examples can be found at: https://github.com/aebergl/MatSurv
 %
 % *** Anders Berglund ***
 
@@ -253,12 +256,15 @@ if ~options.NoPlot
     fh=figure('Name','MatSurv KM-Plot','Color','w','Tag','MatSurv KM-Plot figure');
     
     %Create Axes
-    axh_KM = axes(fh,'Position',options.KM_position,'NextPlot','add','tag','KM-Plot');
-    axh_RT = axes(fh,'Position',options.RT_position,'tag','Risk Table');
-    % No axis for the Risk Table
-    axh_RT.XAxis.Visible='off';
-    axh_RT.YAxis.Visible='off';
-    
+    if options.NoRiskTable
+        axh_KM = axes(fh,'NextPlot','add','tag','KM-Plot');
+    else
+        axh_KM = axes(fh,'Position',options.KM_position,'NextPlot','add','tag','KM-Plot');
+        axh_RT = axes(fh,'Position',options.RT_position,'tag','Risk Table');
+        % No axis for the Risk Table
+        axh_RT.XAxis.Visible='off';
+        axh_RT.YAxis.Visible='off';
+    end
     % Adjust Colors for user input
     if ischar(options.LineColor)
         cMAP = colormap(options.LineColor);
@@ -347,7 +353,6 @@ if ~options.NoPlot
     if ~isempty(options.XTicks)
         axh_KM.XTick = options.XTicks;
     end
-    axh_RT.XTick=axh_KM.XTick;
     axh_KM.XAxis.MinorTick = 'on';
     XMinorStep =  (axh_KM.XTick(2) - axh_KM.XTick(1) ) / (1+options.XMinorTick);
     axh_KM.XAxis.MinorTickValues = XMinorStep:XMinorStep:axh_KM.XTick(end);
@@ -366,53 +371,55 @@ if ~options.NoPlot
     end
     
     % And now to the Risk table
-    
-    % Get number of samples for each time point
-    RT_X = zeros(length(axh_KM.XTick),DATA.numGroups);
-    for i = 1:length(axh_KM.XTick)
-        for j = 1:DATA.numGroups
-            %RT_X(i,j) = sum(DATA.GROUPS(j).TimeVar > axh_KM.XTick(i) & DATA.GROUPS(j).EventVar == 1) + sum(DATA.GROUPS(j).TimeVar >= axh_KM.XTick(i) & DATA.GROUPS(j).EventVar == 0);
-            RT_X(i,j) = sum(DATA.GROUPS(j).TimeVar >= axh_KM.XTick(i));
+    if ~options.NoRiskTable
+        axh_RT.XTick=axh_KM.XTick;
+        % Get number of samples for each time point
+        RT_X = zeros(length(axh_KM.XTick),DATA.numGroups);
+        for i = 1:length(axh_KM.XTick)
+            for j = 1:DATA.numGroups
+                %RT_X(i,j) = sum(DATA.GROUPS(j).TimeVar > axh_KM.XTick(i) & DATA.GROUPS(j).EventVar == 1) + sum(DATA.GROUPS(j).TimeVar >= axh_KM.XTick(i) & DATA.GROUPS(j).EventVar == 0);
+                RT_X(i,j) = sum(DATA.GROUPS(j).TimeVar >= axh_KM.XTick(i));
+            end
+            
+        end
+        axh_RT.YLim = [0.5 DATA.numGroups + 0.5];
+        axh_RT.YTick = 1:DATA.numGroups;
+        linkaxes([axh_RT,axh_KM],'x')
+        
+        % Color OptionsFor Risk Table
+        if ischar(options.RT_Color) && strcmpi('same',options.RT_Color)
+            cMAP_RT = cMAP;
+        elseif ismatrix(options.RT_Color)
+            cMAP_RT = options.RT_Color;
+            cMAP_RT = repmat(cMAP_RT,DATA.numGroups,1);
         end
         
-    end
-    axh_RT.YLim = [0.5 DATA.numGroups + 0.5];
-    axh_RT.YTick = 1:DATA.numGroups;
-    linkaxes([axh_RT,axh_KM],'x')
-    
-    % Color OptionsFor Risk Table
-    if ischar(options.RT_Color) && strcmpi('same',options.RT_Color)
-        cMAP_RT = cMAP;
-    elseif ismatrix(options.RT_Color)
-        cMAP_RT = options.RT_Color;
-        cMAP_RT = repmat(cMAP_RT,DATA.numGroups,1);
-    end
-    
-    for i = 1:length(axh_KM.XTick)
-        for j = 1:DATA.numGroups
-            %sprintf('%u',RT_X(i,j))
-            text(axh_RT,axh_RT.XTick(i),axh_RT.YTick(end-j+1),sprintf('%u',RT_X(i,j)),...
-                'HorizontalAlignment','center','VerticalAlignment','middle',...
-                'FontSize',options.BaseFontSize + options.RT_FontSize,'Color',cMAP_RT(j,:))
+        for i = 1:length(axh_KM.XTick)
+            for j = 1:DATA.numGroups
+                %sprintf('%u',RT_X(i,j))
+                text(axh_RT,axh_RT.XTick(i),axh_RT.YTick(end-j+1),sprintf('%u',RT_X(i,j)),...
+                    'HorizontalAlignment','center','VerticalAlignment','middle',...
+                    'FontSize',options.BaseFontSize + options.RT_FontSize,'Color',cMAP_RT(j,:))
+            end
         end
-    end
-    
-    %Set Y label for risk table
-    if options.RT_YLabel
-        left_pos = axh_RT.Children(end).Extent(1); % Get left most position for text
-        nudge_x = abs(axh_RT.XLim(2) - axh_RT.XLim(1))/100;
         
-        line(axh_RT,[left_pos-nudge_x left_pos-nudge_x],[axh_RT.YTick(1)-0.5 axh_RT.YTick(end)+0.5],'color','k','clipping','off','LineWidth',1.25)
-        for j = 1:DATA.numGroups
-            text(axh_RT,left_pos-(nudge_x*2),axh_RT.YTick(end-j+1),DATA.GROUPS(j).GroupName,...
-                'HorizontalAlignment','right','VerticalAlignment','middle',...
-                'FontSize',options.BaseFontSize + options.RT_FontSize,'Color',cMAP_RT(j,:),'FontWeight','bold')
+        %Set Y label for risk table
+        if options.RT_YLabel
+            left_pos = axh_RT.Children(end).Extent(1); % Get left most position for text
+            nudge_x = abs(axh_RT.XLim(2) - axh_RT.XLim(1))/100;
+            
+            line(axh_RT,[left_pos-nudge_x left_pos-nudge_x],[axh_RT.YTick(1)-0.5 axh_RT.YTick(end)+0.5],'color','k','clipping','off','LineWidth',1.25)
+            for j = 1:DATA.numGroups
+                text(axh_RT,left_pos-(nudge_x*2),axh_RT.YTick(end-j+1),DATA.GROUPS(j).GroupName,...
+                    'HorizontalAlignment','right','VerticalAlignment','middle',...
+                    'FontSize',options.BaseFontSize + options.RT_FontSize,'Color',cMAP_RT(j,:),'FontWeight','bold')
+            end
         end
-    end
-    % Title
-    if ~isempty(options.RT_Title)
-        ht = title(axh_RT,options.RT_Title,'FontSize',14,options.TitleOptions{:});
-        ht.VerticalAlignment='middle';
+        % Title
+        if ~isempty(options.RT_Title)
+            ht = title(axh_RT,options.RT_Title,'FontSize',14,options.TitleOptions{:});
+            ht.VerticalAlignment='middle';
+        end
     end
 else
     fh = [];
@@ -436,6 +443,7 @@ function params = MatSurvParseInput(varargin)
 %Parse input and set defualt values
 p = inputParser;
 p.addParameter('NoPlot',false);
+p.addParameter('NoRiskTable',false);
 p.addParameter('CutPoint','Median');
 p.addParameter('GroupOrder',[]);
 p.addParameter('GroupsToUse',[]);
@@ -485,7 +493,7 @@ p.addParameter('YMinorTick',1);
 p.addParameter('Title',[]);
 p.addParameter('TitleOptions',cell(0,0));
 p.addParameter('LegendFontSize',-2);
-p.addParameter('PvalFontSize',0);
+p.addParameter('PvalFontSize',-2);
 
 % Risk table plot options
 p.addParameter('RT_FontSize',0);
@@ -575,7 +583,7 @@ else % Special case for 2 groups
     V = Var_OE_sum;
 end
 
-%Calculate Chi2 
+%Calculate Chi2
 stats.Chi2 = d'/V*d;
 p = 1 - gammainc(stats.Chi2/2,(DATA.numGroups-1)/2);
 stats.p = p;
@@ -702,8 +710,8 @@ elseif strcmpi('Quartile',options.CutPoint)  && isnumeric(GroupVar)
     DATA.GROUPS(2).GroupName = {sprintf('%s <= %g',tmp_txt,Cut_Val)};
     DATA.GROUPS(2).TimeVar = TimeVar(indx_Below);
     DATA.GROUPS(2).EventVar = EventVarBin(indx_Below);
-
-    % Vector with several cut pints 
+    
+    % Vector with several cut pints
 elseif (isvector(options.CutPoint)) && isnumeric(GroupVar)
     CutPointSorted = sort(options.CutPoint,'descend');
     DATA.numGroups = length(CutPointSorted) + 1;
@@ -738,9 +746,9 @@ end
 end
 
 function [TimeVar, EventVarBin] = MatSurvCensorTimeMax(TimeVar, EventVarBin, options)
-    indx_TimeMax = (TimeVar > options.TimeMax);
-    TimeVar(indx_TimeMax) = options.TimeMax;
-    EventVarBin(indx_TimeMax) = 0;
+indx_TimeMax = (TimeVar > options.TimeMax);
+TimeVar(indx_TimeMax) = options.TimeMax;
+EventVarBin(indx_TimeMax) = 0;
 end
 
 function [EventVarBin] = MatSurvDefineEventVar(EventVar, options)
@@ -781,7 +789,7 @@ end
 function [TimeVar, EventVar, GroupVar] = MatSurvCleanData(TimeVar, EventVar, GroupVar, options)
 % Functions to check and cleanup inout data
 
-% Make sure that TimeVar, EventVar, GroupVar are all column vectors 
+% Make sure that TimeVar, EventVar, GroupVar are all column vectors
 % and not row vectors
 if size(TimeVar,1) == 1
     TimeVar = TimeVar';
