@@ -14,6 +14,14 @@ Coming soon:
 
 ## Simple Example ##
 
+The following code loads the data from "Freireich, EJ et al. 1963, Blood, 21, 699-716)" and creates a KM-plot with risk table. The time unit is weeks and the X-axis step length is changed to 4. The risk table shows how many is at risk (alive) for each time point. Censored point are marked with a vertical line. 
+ 
+```matlab
+
+[p,fh,stats]=MatSurv([], [], [],'Xstep',4,'Title','MatSurv KM-Plot');
+
+```
+
 
 USAGE:
   MatSurv(TimeVar, EventVar, GroupVar,'param', value, ...) creates a Kaplan-Meier plot,
