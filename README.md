@@ -1,17 +1,12 @@
 # MatSurv
-Survival analysis in MATLAB
-
 USAGE:
   MatSurv(TimeVar, EventVar, GroupVar,'param', value, ...) creates a Kaplan-Meier plot,
   a risk table and calculates a log rank p-value
 
   [p] = MatSurv( ... ) returns the log rank p-value
-  
   [p, fh] = MatSurv( ... ) returns both p-value and figure handle
-  
   [p, fh, stats] = MatSurv( ... ) returns additions stats from log rank test
-  
-  [p, fh, stats] = MatSurv([], [], [], ... ) loads toy dataset
+  [p, fh, stats] = MatSurv([], [], [], ... ) loads test dataset
 
 INPUTS:
 * 'TimeVar' is a vector with numeric time to event, either observed or
@@ -24,7 +19,7 @@ INPUTS:
   'EventDefinition' can be used to define other types of events
 
 * 'GroupVar' is a vector or cell array defining the different groups.
-  If it is a continues variable median cut will be used as a default.
+  If 'GroupVar' is a continues variable, median cut will be used as a default.
 
 OUTPUTS:
 * p       : log rank p-value
@@ -35,8 +30,8 @@ OTHER PARAMETERS (passed as parameter-value pairs)
 * 'NoPlot': A true/false value which, if true, no figure is created
   (default: false)
 
-* 'CalcP': A true/false value which, if true, a log rank test is
-  performed and displayed on the KM-plot. (default: true)
+* 'NoRiskTable': A true/false value which, if true, no risk table is
+  included in the KM-plot. (default: false)
 
 * 'CutPoint': Either a string or scalar/vector with cut points to be used
   for defining groups based on a continuous 'GroupVar' input variable
@@ -53,22 +48,47 @@ OTHER PARAMETERS (passed as parameter-value pairs)
 * 'EventDefinition': Two element cell array where the first cell defines
   the event and the second censored values. Example {'Dead,'Alive'}
 
+* 'TimeMin': Scalar defining minimum valid time point. Subjects with time
+  values below this will be removed. (default: 0)
+
+* 'TimeMAx': Scalar value defining righ censoring time. Subjects with
+  TimeVar > TimeMax will be set to TimeMax and considered as censored.
+  (default: [])
+
+* 'PairWiseP': A true/false for caulculating pairwise log rank test
+  between group pairs, useful if there is more than two groups. (default: false)
+
+* 'NoWarnings': A true/false value which, if true, no warnings are printed
+  id subjects are removed. (default: false)
+
+KM plot options
 * 'FlipGroupOrder': Flips the order of the groups in the legend.
   (default: false)
 
 * 'FlipColorOrder': Flips the color order of the groups.
   (default: false)
 
+* 'KM_position': Vector defining the KM axes for the KM plot
+  (default: [0.3 0.4 0.68 0.45])
+
+* 'RT_position': Vector defining the Risk Table axes for the KM plot
+  (default: [0.3 0.05 0.68 0.20])
+
+* 'TimeUnit': String defning time unit displayd on the x-axis.
+  (default: 'Months')
+
 * 'BaseFontSize': Base font size for all text in the plot
   (default: 16)
 
-* 'KM_position': Vector defining the KM axes for the KM plot
-  (default: [0.2 0.4 0.75 0.45])
+* 'DispP': A true/false value which, if true, log rank test p-value
+  is displayed on the KM-plot. (default: true)
 
-* 'RT_position': Vector defining the Risk Table axes for the KM plot
-  (default: [0.2 0.05 0.75 0.20])
+* 'DispHR': A true/false value which, if true, Hazard ration (HR)
+  is displayed on the KM-plot. (default: true)
 
-KM plot options
+* 'InvHR': A true/false value which, if true, the iverted HR value
+  is displayed on the KM-plot. (default: false)
+
 * 'XLim': Vector defining the XLim. Do not affect the log rank test
   (default: automatic)
 
@@ -160,6 +180,7 @@ Risk table plot options
 
 MatSurv do NOT use any toolboxes
 
-*** Anders Berglund ***
+  More examples can be found at: https://github.com/aebergl/MatSurv
 
+*** Anders Berglund ***
 
