@@ -1,11 +1,16 @@
 # MatSurv
+MatSurv is a simple survival analysis function for MATLAB that creates a KM-plot with risk table. Survival statistics, such as log rank p-value Hazard Ration (HR) are also calculated. The log rank test have been tested to give the same results as SAS and R. The style of the KM-plot is easily changed with input parameters. No additional toolboxes are needed. MatSurv was inspired by the [survminer R-package](https://github.com/kassambara/survminer).
+
 USAGE:
   MatSurv(TimeVar, EventVar, GroupVar,'param', value, ...) creates a Kaplan-Meier plot,
   a risk table and calculates a log rank p-value
 
   [p] = MatSurv( ... ) returns the log rank p-value
+  
   [p, fh] = MatSurv( ... ) returns both p-value and figure handle
+  
   [p, fh, stats] = MatSurv( ... ) returns additions stats from log rank test
+  
   [p, fh, stats] = MatSurv([], [], [], ... ) loads test dataset
 
 INPUTS:
