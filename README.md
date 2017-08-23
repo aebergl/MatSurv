@@ -10,7 +10,7 @@ The general usage is:
 - [Simple Example](#Simple-Example)
 - [Using MatSurv](#Using-Matsurv)
 - [More Examples](#features)
-- [List of all input options)](#List-of-all-input-options)
+- [List of all input options](#List-of-all-input-options)
 
 
 ## Citing MatSurv ##
