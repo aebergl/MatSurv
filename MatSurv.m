@@ -804,23 +804,21 @@ end
 % Check time variable for missing data and timepoints < TimeMin
 rem_indx_time = ( isnan(TimeVar) | (TimeVar <= options.TimeMin) );
 
-% Check time variable for missing data and/or empty cells and cells with NA
+% Check Event variable for missing data and/or empty cells and cells with NA
 if isnumeric(EventVar) || islogical(EventVar)
     rem_indx_event = isnan(EventVar);
 elseif iscell(EventVar)
-    rem_indx_event = any(isempty(EventVar), strcmpi('NA',EventVar));
+    rem_indx_event = (cellfun('isempty',EventVar));
 end
-
-% Check time variable for missing data and/or empty cells and cells with NA
+% Check Group variable for missing data and/or empty cells and cells with NA
 if isnumeric(GroupVar)
     rem_indx_group = isnan(GroupVar);
 elseif iscell(GroupVar)
-    rem_indx_group = (isempty(GroupVar) | strcmpi('NA',GroupVar));
+    rem_indx_group = (cellfun('isempty',GroupVar) | strcmpi('NA',GroupVar));
 end
 
 % Merge all indexes
 rem_indx = (rem_indx_time | rem_indx_event |rem_indx_group);
-
 if sum(rem_indx) > 0
     TimeVar(rem_indx) = [];
     EventVar(rem_indx) = [];
@@ -828,13 +826,15 @@ if sum(rem_indx) > 0
     if ~options.NoWarnings
         fprintf('*********************************\n');
         fprintf('\n');
-        fprintf('%u sample have been removed',sum(rem_indx));
+        fprintf('%u sample have been removed\n',sum(rem_indx));
         fprintf('removed samples had missing data or time < %g\n',options.TimeMin)
+        fprintf('\n');
+        fprintf('*********************************\n');
     end
     
 end
 
-numEvenTypes = unique(EventVar);
+numEvenTypes = length(unique(EventVar));
 if numEvenTypes > 2
     error('More then 2 event types in the Event variable');
 end
