@@ -30,7 +30,7 @@ The following code loads the data from "Freireich, EJ et al. 1963, Blood, 21, 69
 ## Using MatSurv ##
 
 ### Installation ###
-Simply put MatSurv in any directory of your choice and make sure its added to your path
+Simply put MatSurv.m in any directory of your choice and make sure its added to your path
 
 ### Usage ###
   MatSurv(TimeVar, EventVar, GroupVar,'param', value, ...) creates a Kaplan-Meier plot,
