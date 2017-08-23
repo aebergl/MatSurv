@@ -1,20 +1,25 @@
 # MatSurv
-MatSurv is a simple survival analysis function for MATLAB that creates a KM-plot with risk table. Survival statistics, such as log rank p-value Hazard Ration (HR) are also calculated. The log rank test have been tested to give the same results as SAS and R. The style of the KM-plot is easily changed with input parameters. No additional toolboxes are needed. MatSurv was inspired by the [survminer R-package](https://github.com/kassambara/survminer).
+MatSurv is a simple survival analysis function for MATLAB that creates a KM-plot with risk table. Survival statistics, such as log rank p-value Hazard Ration (HR) are also calculated. The log rank test has been tested to give the same results as SAS and R. The style of the KM-plot is easily changed with input parameters. No additional toolboxes are needed. MatSurv was inspired by the [survminer R-package](https://github.com/kassambara/survminer).
+The general usage is:
+```matlab
+[p, fh, stats] = MatSurv(TimeVar, EventVar, GroupVar,'param', value, …)
+```
 
 ## Table of contents ##
 - [Citing MatSurv](#Citing-MatSurv)
-- [Simple example](#Simple-Example)
-- [More Features](#features)
-- [List of all input options)](#use-cases-and-examples)
+- [Simple Example](#Simple-Example)
+- [Using MatSurv](#Using-Matsurv)
+- [More Examples](#features)
+- [List of all input options)](#List-of-all-input-options)
 
 
 ## Citing MatSurv ##
 
-Coming soon:
+Coming soon!
 
 ## Simple Example ##
 
-The following code loads the data from "Freireich, EJ et al. 1963, Blood, 21, 699-716)" and creates a KM-plot with risk table. The time unit is weeks and the X-axis step length is changed to 4. The risk table shows how many is at risk (alive) for each time point. Censored point are marked with a vertical line. 
+The following code loads the data from "Freireich, EJ et al. 1963, Blood, 21, 699-716)" and creates a KM-plot with risk table. The time unit is weeks and the X-axis step length is changed to 4. The risk table shows how many is at risk (alive) for each time point. Censored points are marked with a vertical line. 
  
 ```matlab
 
@@ -22,17 +27,18 @@ The following code loads the data from "Freireich, EJ et al. 1963, Blood, 21, 69
 
 ```
 
+## Using MatSurv ##
 
-USAGE:
+### Installation ###
+Simply put MatSurv in any directory of your choice and make sure its added to your path
+
+### Usage ###
   MatSurv(TimeVar, EventVar, GroupVar,'param', value, ...) creates a Kaplan-Meier plot,
   a risk table and calculates a log rank p-value
 
   [p] = MatSurv( ... ) returns the log rank p-value
-  
   [p, fh] = MatSurv( ... ) returns both p-value and figure handle
-  
   [p, fh, stats] = MatSurv( ... ) returns additions stats from log rank test
-  
   [p, fh, stats] = MatSurv([], [], [], ... ) loads test dataset
 
 INPUTS:
@@ -53,7 +59,13 @@ OUTPUTS:
 * fh      : figure handle to KM-plot figure
 * stats   : Additional statistics from the log rank test
 
-OTHER PARAMETERS (passed as parameter-value pairs)
+
+## More Features ##
+
+Below is some examples given how to create different style of the KM-Plot and also how one can make change using the figure handle
+
+## List of all input options ##
+
 * 'NoPlot': A true/false value which, if true, no figure is created
   (default: false)
 
@@ -201,13 +213,4 @@ Risk table plot options
 * 'RT_YLabel': True/False for displaying the group names on the Risk table
   Y-axis (Default: True )
 
-  EXAMPLES:
-  [p,fh,stats] = MatSurv([], [], [],'Xstep',4,'Title','MatSurv KM-Plot','FlipColor',1,'XMinorTick',3);
-
-
-MatSurv do NOT use any toolboxes
-
-  More examples can be found at: https://github.com/aebergl/MatSurv
-
-*** Anders Berglund ***
 
