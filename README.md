@@ -27,6 +27,8 @@ The following code loads the data from "Freireich, EJ et al. 1963, Blood, 21, 69
 
 ```
 
+<img src="/html/Example_01.png" alt="MatSurv example" width="800">
+
 ## Using MatSurv ##
 
 ### Installation ###
