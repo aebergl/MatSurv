@@ -27,10 +27,6 @@ The following code loads the data from "Freireich, EJ et al. 1963, Blood, 21, 69
 
 ```
 
-<img src="/html/Example_01.png" alt="MatSurv example" width="600">
-
-
-
 ## Using MatSurv ##
 
 ### Installation ###
@@ -41,11 +37,8 @@ Simply put MatSurv.m in any directory of your choice and make sure its added to 
   a risk table and calculates a log rank p-value
 
   [p] = MatSurv( ... ) returns the log rank p-value
-  
   [p, fh] = MatSurv( ... ) returns both p-value and figure handle
-  
   [p, fh, stats] = MatSurv( ... ) returns additions stats from log rank test
-  
   [p, fh, stats] = MatSurv([], [], [], ... ) loads test dataset
 
 INPUTS:
@@ -69,7 +62,18 @@ OUTPUTS:
 
 ## More Features ##
 
-Below is some examples given how to create different style of the KM-Plot and also how one can make change using the figure handle
+Below is some examples given how to create different style of the KM-Plot and also how one can make changes using the figure handle.
+
+In the example below we show how we can change some of the properties of the KM-Plot using various name-value pair arguments. 
+
+```matlab
+
+
+[p,fh,stats]=MatSurv([], [], [],'Xstep',4,'Title','MatSurv_KM Plot','TitleOptions',{'Color','r','Interpreter','none'},'InvHR',1,'Xlim',32,'XMinorTick',3,'LineColor',[0 0 1;1 0 1],'LineStyle',{'-',':'},'LineWidth',3,'CensorLineColor','k','RT_Title','Risk Table');
+
+
+‘’’
+
 
 ## List of all input options ##
 
@@ -101,7 +105,7 @@ Below is some examples given how to create different style of the KM-Plot and al
   TimeVar > TimeMax will be set to TimeMax and considered as censored.
   (default: [])
 
-* 'PairWiseP': A true/false for caulculating pairwise log rank test
+* 'PairWiseP': A true/false for calculating pairwise log rank test
   between group pairs, useful if there is more than two groups. (default: false)
 
 * 'NoWarnings': A true/false value which, if true, no warnings are printed
@@ -120,7 +124,7 @@ KM plot options
 * 'RT_position': Vector defining the Risk Table axes for the KM plot
   (default: [0.3 0.05 0.68 0.20])
 
-* 'TimeUnit': String defning time unit displayd on the x-axis.
+* 'TimeUnit': String defining time unit displayed on the x-axis.
   (default: 'Months')
 
 * 'BaseFontSize': Base font size for all text in the plot
@@ -195,7 +199,7 @@ KM plot options
 * 'YTickFontSize': Scalar describing Ytick font size change compared
   to base font size (Default: -2)
 
-* 'Title': Text string for Title (Default: '' )
+* 'Title': Text string for Title (Default: ' ' )
 
 * 'TitleOptions': MATLAB Name-value pair arguments for Title (Default: '')
 
