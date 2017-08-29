@@ -267,9 +267,9 @@ if ~options.NoPlot
     end
     % Adjust Colors for user input
     if ischar(options.LineColor)
-        cMAP = colormap(options.LineColor);
+        cMAP = colormap(options.LineColor,DATA.numGroups);
     elseif ismatrix(options.LineColor)
-        cMAP = options.LineStyle;
+        cMAP = options.LineColor;
     end
     cMAP = cMAP(1:DATA.numGroups,:);
     if options.FlipColorOrder
