@@ -185,6 +185,7 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 % *** Anders Berglund ***
 
 
+
 % Check TimeVar, EventVar, GroupVar variables
 if nargin < 3
     error('MatSurv requires at least 3 input argument');
