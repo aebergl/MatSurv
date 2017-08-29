@@ -69,7 +69,9 @@ In the example below we show how we can change some of the properties of the KM-
 ```matlab
 
 
-[p,fh,stats]=MatSurv([], [], [],'Xstep',4,'Title','MatSurv_KM Plot','TitleOptions',{'Color','r','Interpreter','none'},'InvHR',1,'Xlim',32,'XMinorTick',3,'LineColor',[0 0 1;1 0 1],'LineStyle',{'-',':'},'LineWidth',3,'CensorLineColor','k','RT_Title','Risk Table');
+[p,fh,stats]=MatSurv([],[],[],'Xstep',4,'Title','MatSurv_KM Plot','TitleOptions',{'Color','r','Interpreter','none'},...
+'InvHR',1,'Xlim',32,'XMinorTick',3,'LineColor',[0 0 1;1 0 1],'LineStyle',{'-',':'},'LineWidth',3,...
+'CensorLineColor','k','RT_Title','Risk Table');
 
 
 ```
