@@ -1,0 +1,46 @@
+---
+output: html_document
+---
+
+<!-- load packages and data --> 
+```{r include = FALSE}
+
+library(knitr)
+library(kableExtra)
+options(knitr.table.format="html")
+library(cgdsr)
+library(survival)
+library(survminer)
+
+con <- CGDS("http://www.cbioportal.org/")
+
+dat <- getClinicalData(con, "laml_tcga_pub_all")
+```
+
+### Basic data properties
+The initial data set has `r nrow(dat)` patients, with cytological risk distributed as follows. 
+```{r, echo=FALSE, results='asis'}
+kable_styling(kable(t(as.matrix(table(dat$RISK_CYTO))), align="c"),
+              bootstrap_options=c("condensed", "hover"), full_width=FALSE)
+```
+
+<!-- remove patients with missing indeterminate risk -->
+```{r include = FALSE} 
+dat <- subset(dat, RISK_CYTO!="N.D.")
+```
+
+Indeterminate cytological risk patients were dropped, with a resulting patient set of size `r nrow(dat)`. The distribution of overall survival (months) by cytological risk is
+```{r, echo=FALSE}
+tapply(dat$OS_MONTHS, dat$RISK_CYTO, summary)
+```
+
+### Log-rank test and KM plot
+```{r, echo=FALSE, fig.width=12, fig.height=9}
+dat$survobj <- Surv(time=dat$OS_MONTHS, event=ifelse(dat$OS_STATUS=="DECEASED", 1, 0))
+
+survdiff(survobj ~ RISK_CYTO, data=dat)
+
+fit <- survfit(survobj ~ RISK_CYTO, data=dat)
+ggsurvplot(fit, risk.table=TRUE, pval=TRUE, risk.table.y.text.col=TRUE, risk.table.y.text=FALSE)
+```
+
