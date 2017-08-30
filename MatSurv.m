@@ -10,7 +10,7 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 %
 % INPUTS:
 % * 'TimeVar' is a vector with numeric time to event, either observed or
-%   censored. Values equal or less than zero will be removed by default
+%   censored. Values less than zero will be removed by default
 %
 % * 'EventVar' is a vector or cell array defining events or censored
 %   observation. Events are defined with a 1 and censored point with a 0. By
@@ -93,7 +93,8 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 %   (default: automatic)
 %
 % * 'LineColor': Either a matrix of size numLevels-by-3 representing the
-%   colormap to be used or a string for a MATLAB colormap
+%   colormap to be used or a string for a MATLAB colormap (parula cool,
+%   prism and so on)
 %   (default: 'lines')
 %
 % * 'LineWidth': Scalar defining the line width used in the KM-plot
@@ -193,7 +194,7 @@ end
 
 % Load test data
 if isempty(TimeVar) && isempty(EventVar) && isempty(GroupVar)
-    [TimeVar, EventVar, GroupVar] = SurvMatLoadTestData;
+    [TimeVar, EventVar, GroupVar] = MatSurvLoadTestData;
     varargin =[varargin,{'TimeUnit','Weeks'}];
 end
 
@@ -268,7 +269,7 @@ if ~options.NoPlot
     end
     % Adjust Colors for user input
     if ischar(options.LineColor)
-        cMAP = colormap(options.LineColor,DATA.numGroups);
+        cMAP = feval(options.LineColor, DATA.numGroups);
     elseif ismatrix(options.LineColor)
         cMAP = options.LineColor;
     end
@@ -338,6 +339,7 @@ if ~options.NoPlot
     % Set legend
     h_LE=legend(S,[DATA.GROUPS(:).GroupName]);
     h_LE.Box='off';
+    title(h_LE,DATA.GroupType);
     h_LE.FontSize=options.BaseFontSize + options.LegendFontSize;
     
     % Get Xticks
@@ -550,8 +552,8 @@ if DATA.numGroups == 2
     stats.low95 = exp((log(stats.HR) - 1.96 * sqrt(1/sum(ef(:,1)) + 1/sum(ef(:,2)))));
     stats.up95 = exp((log(stats.HR) + 1.96 * sqrt(1/sum(ef(:,1)) + 1/sum(ef(:,2)))));
     stats.HR_Inv = 1/stats.HR;
-    stats.up95_Inv = 1/stats.up95;
-    stats.low95_Inv = 1/stats.low95;
+    stats.low95_Inv = 1/stats.up95;
+    stats.up95_Inv = 1/stats.low95;
 end
 
 %Calculate Variance
@@ -671,6 +673,7 @@ if ~isempty(options.GroupsToUse) % User defined Groups to use
 elseif iscell(GroupVar)
     Unique_Groups = unique(GroupVar);
     DATA.numGroups = length(Unique_Groups);
+    DATA.GroupType = 'Groups';
     for i = 1:DATA.numGroups
         indx_group = strcmp(Unique_Groups(i),GroupVar);
         DATA.GROUPS(i).GroupName = Unique_Groups(i);
@@ -682,58 +685,59 @@ elseif iscell(GroupVar)
 elseif (strcmpi('Median',options.CutPoint) || isscalar(options.CutPoint)) && isnumeric(GroupVar)
     if strcmpi('Median',options.CutPoint)
         Cut_Val = median(GroupVar);
-        tmp_txt = 'Median';
+        DATA.GroupType = 'Median';
     elseif isscalar(options.CutPoint)
         Cut_Val = options.CutPoint;
-        tmp_txt = 'Fixed value';
+        DATA.GroupType = 'Fixed value';
     end
     DATA.numGroups = 2;
     indx_Above  = (GroupVar > Cut_Val);
     indx_Below  = (GroupVar <= Cut_Val);
     
-    DATA.GROUPS(1).GroupName = {sprintf('%s > %g',tmp_txt,Cut_Val)};
+    DATA.GROUPS(1).GroupName = {sprintf('x > %g',Cut_Val)};
     DATA.GROUPS(1).TimeVar = TimeVar(indx_Above);
     DATA.GROUPS(1).EventVar = EventVarBin(indx_Above);
     
-    DATA.GROUPS(2).GroupName = {sprintf('%s <= %g',tmp_txt,Cut_Val)};
+    DATA.GROUPS(2).GroupName = {sprintf('x <= %g',Cut_Val)};
     DATA.GROUPS(2).TimeVar = TimeVar(indx_Below);
     DATA.GROUPS(2).EventVar = EventVarBin(indx_Below);
     
 elseif strcmpi('Quartile',options.CutPoint)  && isnumeric(GroupVar)
     Cut_Val = prctile(GroupVar,[25 75]);
-    tmp_txt = 'Quartile';
-    indx_Above = (GroupVar >= Cut_Val);
-    indx_Below  = (GroupVar <= Cut_Val);
+    DATA.GroupType = 'Quartile';
+    indx_Above = (GroupVar >= Cut_Val(2));
+    indx_Below  = (GroupVar <= Cut_Val(1));
     DATA.numGroups = 2;
-    DATA.GROUPS(1).GroupName = {sprintf('%s > %g',tmp_txt,Cut_Val)};
+    DATA.GROUPS(1).GroupName = {sprintf('x >= %g',Cut_Val(1))};
     DATA.GROUPS(1).TimeVar = TimeVar(indx_Above);
     DATA.GROUPS(1).EventVar = EventVarBin(indx_Above);
-    DATA.GROUPS(2).GroupName = {sprintf('%s <= %g',tmp_txt,Cut_Val)};
+    DATA.GROUPS(2).GroupName = {sprintf('x <= %g',Cut_Val(2))};
     DATA.GROUPS(2).TimeVar = TimeVar(indx_Below);
     DATA.GROUPS(2).EventVar = EventVarBin(indx_Below);
     
     % Vector with several cut pints
 elseif (isvector(options.CutPoint)) && isnumeric(GroupVar)
-    CutPointSorted = sort(options.CutPoint,'descend');
+    CutPointSorted = sort(options.CutPoint,'descend')
     DATA.numGroups = length(CutPointSorted) + 1;
+    DATA.GroupType = 'Cut Points';
     
     % For points above
     indx_Above  = (GroupVar > CutPointSorted(1));
-    DATA.GROUPS(1).GroupName = {sprintf('Fixed Value > %g',CutPointSorted(1))};
+    DATA.GROUPS(1).GroupName = {sprintf('x > %g',CutPointSorted(1))};
     DATA.GROUPS(1).TimeVar = TimeVar(indx_Above);
     DATA.GROUPS(1).EventVar = EventVarBin(indx_Above);
     for i = 1:length(CutPointSorted) - 1
-        indx  = (GroupVar > CutPointSorted(i+1) && GroupVar <= CutPointSorted(i));
-        DATA.GROUPS(i+1).GroupName = {sprintf('Fixed Value > %g, <= %g',CutPointSorted(i+1),CutPointSorted(i))};
+        indx  = (GroupVar > CutPointSorted(i+1) & GroupVar <= CutPointSorted(i));
+        DATA.GROUPS(i+1).GroupName = {sprintf('%g > x <= %g',CutPointSorted(i+1),CutPointSorted(i))};
         DATA.GROUPS(i+1).TimeVar = TimeVar(indx);
         DATA.GROUPS(i+1).EventVar = EventVarBin(indx);
     end
     i = i + 1;
     indx  =  (GroupVar <= CutPointSorted(i));
-    DATA.GROUPS(i).GroupName = {sprintf('Fixed Value <= %g',CutPointSorted(i))};
-    DATA.GROUPS(i).TimeVar = TimeVar(indx);
-    DATA.GROUPS(i).EventVar = EventVarBin(indx);
-    
+    DATA.GROUPS(i+1).GroupName = {sprintf('x <= %g',CutPointSorted(i))};
+    DATA.GROUPS(i+1).TimeVar = TimeVar(indx);
+    DATA.GROUPS(i+1).EventVar = EventVarBin(indx);
+
     
 end
 
@@ -803,7 +807,7 @@ if size(GroupVar,1) == 1
 end
 
 % Check time variable for missing data and timepoints < TimeMin
-rem_indx_time = ( isnan(TimeVar) | (TimeVar <= options.TimeMin) );
+rem_indx_time = ( isnan(TimeVar) | (TimeVar < options.TimeMin) );
 
 % Check Event variable for missing data and/or empty cells and cells with NA
 if isnumeric(EventVar) || islogical(EventVar)
@@ -842,7 +846,7 @@ end
 
 end
 
-function [TimeVar, EventVar, GroupVar] = SurvMatLoadTestData
+function [TimeVar, EventVar, GroupVar] = MatSurvLoadTestData
 % Test example taken from "Freireich, EJ et al. 1963, Blood, 21, 699-716)"
 
 t1=[6 6 6 7 10 13 16 22 23 6 9 10 11 17 19 20 25 32 32 34 35]';
