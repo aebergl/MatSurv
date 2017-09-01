@@ -26,7 +26,7 @@ The following code loads the data from "Freireich, EJ et al. 1963, Blood, 21, 69
 [p,fh,stats]=MatSurv([], [], [],'Xstep',4,'Title','MatSurv KM-Plot');
 
 ```
-<img src="/html/Example_01.png" alt="MatSurv example" width="800">
+<img src="/html/Example_01.png" alt="MatSurv example" width="600">
  
 ## Using MatSurv ##
 
@@ -75,7 +75,7 @@ In the example below we show how we can change some of the properties of the KM-
 'LineWidth',3,'CensorLineColor','k','RT_Title','Risk Table');
 
 ```
-<img src="/html/Example_02.png" alt="MatSurv example" width="800">
+<img src="/html/Example_02.png" alt="MatSurv example" width="600">
 
 ## List of all input options ##
 
