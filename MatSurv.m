@@ -718,7 +718,7 @@ elseif strcmpi('Quartile',options.CutPoint)  && isnumeric(GroupVar)
     
     % Vector with several cut pints
 elseif (isvector(options.CutPoint)) && isnumeric(GroupVar)
-    CutPointSorted = sort(options.CutPoint,'descend')
+    CutPointSorted = sort(options.CutPoint,'descend');
     DATA.numGroups = length(CutPointSorted) + 1;
     DATA.GroupType = 'Cut Points';
     
