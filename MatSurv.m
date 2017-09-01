@@ -657,6 +657,7 @@ DATA.GROUPS = struct('GroupName',{},'TimeVar',[],'EventVar',[]);
 % Define set of Groups to use
 if ~isempty(options.GroupsToUse) % User defined Groups to use
     DATA.numGroups = numel(options.GroupsToUse);
+    DATA.GroupType = 'Groups';
     for i = 1:DATA.numGroups
         if iscell(GroupVar)
             indx_group = strcmp(options.GroupsToUse(i),GroupVar);
