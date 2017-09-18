@@ -13,3 +13,18 @@ proc lifetest data=lamlv2(where=(Risk__Cyto_ ^= 'N.D.')) plots=survival(atrisk t
 time Overall_Survival__Months_*Surv(0);
 strata Risk__Cyto_/test=logrank;
 run;
+
+proc lifetest data=hgf plots=survival(atrisk=0 to 120 by 30 test);
+time OS_MONTHS*STATUS(0);
+strata Median/test=logrank;
+run;
+
+proc lifetest data=hgf plots=survival(atrisk=0 to 120 by 30 test);
+time OS_MONTHS*STATUS(0);
+strata Quartile/test=logrank;
+run;
+
+proc lifetest data=hgf plots=survival(atrisk=0 to 120 by 30 test);
+time OS_MONTHS*STATUS(0);
+strata Cut/test=logrank;
+run;
