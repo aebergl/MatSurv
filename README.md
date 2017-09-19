@@ -100,18 +100,28 @@ load laml_RC_data.mat
 % Using median cut
 [p,fh,stats]=MatSurv(laml_HGF_gene_TimeVar,laml_HGF_gene_EventVar,HGF_gene,'Xstep',12,'InvHR',1);
 
-% Using qurtiles
+% Using qurtile
 [p,fh,stats]=MatSurv(laml_HGF_gene_TimeVar,laml_HGF_gene_EventVar,HGF_gene,'Xstep',12,'InvHR',1,'CutPoint','quartile');
 
 % Using Two Cut points
 [p,fh,stats]=MatSurv(laml_HGF_gene_TimeVar,laml_HGF_gene_EventVar,HGF_gene,'Xstep',12,'InvHR',1,'CutPoint',[6 12]);
 
 ```
+#### Median cut ####
+
 <img src="/html/laml_HGF_gene_Median.png" alt="Median MatSurv example" width="600">
+
+
+#### Quartile ####
 
 <img src="/html/laml_HGF_gene_Quartile.png" alt="Quartile MatSurv example" width="600">
 
+
+#### Two cut points ####
+
 <img src="/html/laml_HGF_gene_TwoCutPoints.png" alt="Two Cut points MatSurv example" width="600">
+
+
 
 
 
