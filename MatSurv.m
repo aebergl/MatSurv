@@ -706,13 +706,13 @@ elseif (strcmpi('Median',options.CutPoint) || isscalar(options.CutPoint)) && isn
 elseif strcmpi('Quartile',options.CutPoint)  && isnumeric(GroupVar)
     Cut_Val = prctile(GroupVar,[25 75]);
     DATA.GroupType = 'Quartile';
-    indx_Above = (GroupVar >= Cut_Val(2));
     indx_Below  = (GroupVar <= Cut_Val(1));
+    indx_Above = (GroupVar >= Cut_Val(2));
     DATA.numGroups = 2;
-    DATA.GROUPS(1).GroupName = {sprintf('x >= %g',Cut_Val(1))};
+    DATA.GROUPS(1).GroupName = {sprintf('x <= %g',Cut_Val(1))};
     DATA.GROUPS(1).TimeVar = TimeVar(indx_Above);
     DATA.GROUPS(1).EventVar = EventVarBin(indx_Above);
-    DATA.GROUPS(2).GroupName = {sprintf('x <= %g',Cut_Val(2))};
+    DATA.GROUPS(2).GroupName = {sprintf('x >= %g',Cut_Val(2))};
     DATA.GROUPS(2).TimeVar = TimeVar(indx_Below);
     DATA.GROUPS(2).EventVar = EventVarBin(indx_Below);
     
