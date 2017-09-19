@@ -88,7 +88,7 @@ This example is taken from the TCGA laml data set. How to get the data from cBio
 [p,fh,stats]=MatSurv(laml_RC_TimeVar, laml_RC_EventVar,  laml_RC_GroupVar,...
 'GroupsToUse', {'Good','Intermediate','Poor'},'Xstep',24);
 ```
-<img src="/html/lam_Risk_Cyto.png" alt="MatSurv example" width="600">
+<img src="/html/laml_Risk_Cyto.png" alt="Multiple groups MatSurv example" width="600">
 
 ### Example with gene expression data ###
 
