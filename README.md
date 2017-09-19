@@ -61,8 +61,9 @@ OUTPUTS:
 * stats   : Additional statistics from the log rank test
 
 
-## More Features ##
+## More Examples ##
 
+### Additional options ###
 Below is some examples given how to create different style of the KM-Plot and also how one can make changes using the figure handle.
 
 In the example below we show how we can change some of the properties of the KM-Plot using various name-value pair arguments. 
@@ -76,6 +77,22 @@ In the example below we show how we can change some of the properties of the KM-
 
 ```
 <img src="/html/Example_02.png" alt="MatSurv example" width="600">
+
+### Example with multiple groups ###
+
+This example is taken from the TCGA laml data set. How to get the data from cBioPortal can be found in the MatSurv/Article/MATLAB/get_laml_RC_data.m script. For this example we will load the data directly
+
+```matlab
+ load laml_RC_data.mat
+
+[p,fh,stats]=MatSurv(laml_RC_TimeVar, laml_RC_EventVar,  laml_RC_GroupVar,...
+'GroupsToUse', {'Good','Intermediate','Poor'},'Xstep',24);
+```
+<img src="/html/lam_Risk_Cyto.png" alt="MatSurv example" width="600">
+
+### Example with gene expression data ###
+
+
 
 ## List of all input options ##
 
