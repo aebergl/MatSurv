@@ -19,7 +19,7 @@ time OS_MONTHS*STATUS(0);
 strata Median/test=logrank;
 run;
 
-proc lifetest data=hgf plots=survival(atrisk=0 to 120 by 30 test);
+proc lifetest data=hgf(where=(Quartile ^= 2 & Quartile ^= 3)) plots=survival(atrisk=0 to 120 by 30 test);
 time OS_MONTHS*STATUS(0);
 strata Quartile/test=logrank;
 run;
