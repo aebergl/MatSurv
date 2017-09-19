@@ -15,4 +15,4 @@ if any(EmptyIndx)
 end
 laml_RC_TimeVar = sscanf(sprintf('%s,',laml_RC_TimeVar{:}),'%f,');
 clear c EmptyIndx cgdsURL
-[p,fh,stats]=MatSurv(TimeVar,EventVar,GroupVar,'GroupsToUse',{'Good','Intermediate','Poor'},'Xstep',24);
+[p,fh,stats]=MatSurv(laml_RC_TimeVar,laml_RC_EventVar,laml_RC_GroupVar,'GroupsToUse',{'Good','Intermediate','Poor'},'Xstep',24);
