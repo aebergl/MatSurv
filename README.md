@@ -83,7 +83,7 @@ In the example below we show how we can change some of the properties of the KM-
 This example is taken from the TCGA laml data set. How to get the data from cBioPortal can be found in the MatSurv/Article/MATLAB/get_laml_RC_data.m script. For this example we will load the data directly
 
 ```matlab
- load laml_RC_data.mat
+load laml_RC_data.mat
 
 [p,fh,stats]=MatSurv(laml_RC_TimeVar, laml_RC_EventVar,  laml_RC_GroupVar,...
 'GroupsToUse', {'Good','Intermediate','Poor'},'Xstep',24);
@@ -91,6 +91,28 @@ This example is taken from the TCGA laml data set. How to get the data from cBio
 <img src="/html/laml_Risk_Cyto.png" alt="Multiple groups MatSurv example" width="600">
 
 ### Example with gene expression data ###
+
+This example also taken from the TCGA laml dataset but we also get the RNAseq gene expression data for the HGF gene. How to get the data from cBioPortal can be found in the MatSurv/Article/MATLAB/get_laml_HGF_gene_data.m script. For this example we will load the data directly
+
+```matlab
+load laml_RC_data.mat
+
+% Using median cut
+[p,fh,stats]=MatSurv(laml_HGF_gene_TimeVar,laml_HGF_gene_EventVar,HGF_gene,'Xstep',12,'InvHR',1);
+
+% Using qurtiles
+[p,fh,stats]=MatSurv(laml_HGF_gene_TimeVar,laml_HGF_gene_EventVar,HGF_gene,'Xstep',12,'InvHR',1,'CutPoint','quartile');
+
+% Using Two Cut points
+[p,fh,stats]=MatSurv(laml_HGF_gene_TimeVar,laml_HGF_gene_EventVar,HGF_gene,'Xstep',12,'InvHR',1,'CutPoint',[6 12]);
+
+```
+<img src="/html/laml_HGF_gene_Median.png" alt="Median MatSurv example" width="600">
+
+<img src="/html/laml_HGF_gene_Quartile.png" alt="Quartile MatSurv example" width="600">
+
+<img src="/html/laml_HGF_gene_TwoCutPoints.png" alt="Two Cut points MatSurv example" width="600">
+
 
 
 
