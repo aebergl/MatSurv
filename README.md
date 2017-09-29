@@ -38,8 +38,11 @@ Simply put MatSurv.m in any directory of your choice and make sure its added to 
   a risk table and calculates a log rank p-value
 
   [p] = MatSurv( ... ) returns the log rank p-value
+  
   [p, fh] = MatSurv( ... ) returns both p-value and figure handle
+  
   [p, fh, stats] = MatSurv( ... ) returns additions stats from log rank test
+  
   [p, fh, stats] = MatSurv([], [], [], ... ) loads test dataset
 
 INPUTS:
