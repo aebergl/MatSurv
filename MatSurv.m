@@ -61,7 +61,13 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 % * 'NoWarnings': A true/false value which, if true, no warnings are printed
 %   if subjects are removed. (default: false)
 %
+%
 % KM plot options
+%
+% * 'LineColor': Either a matrix of size numLevels-by-3 representing the
+%   colormap to be used or a string for a MATLAB colormap (lines, parula,
+%   cool, prism) or 'JCO' 'nejm' 'Lancet' 'Science' 'Nature','lines' for a
+%   set of Journal dependent palettes or my default 'aeb01' (default:'aeb01')
 % * 'FlipGroupOrder': Flips the order of the groups in the legend.
 %   (default: false)
 %
@@ -91,11 +97,6 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 %
 % * 'XLim': Vector defining the XLim. Do not affect the log rank test
 %   (default: automatic)
-%
-% * 'LineColor': Either a matrix of size numLevels-by-3 representing the
-%   colormap to be used or a string for a MATLAB colormap (parula cool,
-%   prism and so on)
-%   (default: 'lines')
 %
 % * 'LineWidth': Scalar defining the line width used in the KM-plot
 %   (Default: 2)
@@ -249,7 +250,7 @@ if options.PairWiseP
             [~,stats.ParwiseStats(counter)] = MatSurvLogRank(DATA_tmp);
             stats.ParwiseName{counter} = sprintf('%s vs. %s',DATA.GROUPS(i).GroupName{1},DATA.GROUPS(j).GroupName{1});
         end
-    end    
+    end
 end
 
 % Creat KM-Plot
@@ -270,12 +271,18 @@ if ~options.NoPlot
     
     % Adjust Colors for user input
     if ischar(options.LineColor)
-        cMAP = feval(options.LineColor, DATA.numGroups);
+        if any(strcmpi(options.LineColor,{'JCO','nejm','Lancet','Science','Nature','aeb01'}))
+            cMAP = GetMatSurvColorPalette(options.LineColor);
+        else
+            cMAP = feval(options.LineColor, DATA.numGroups);
+        end
     elseif ismatrix(options.LineColor)
         cMAP = options.LineColor;
         cMAP = cMAP(1:DATA.numGroups,:);
+    else
+        cMAP = GetMatSurvColorPalette;
     end
-
+    
     if options.FlipColorOrder
         cMAP = flipud(cMAP);
     end
@@ -475,7 +482,7 @@ p.addParameter('XTicks',[], @(x)isnumeric(x) && isvector(x));
 p.addParameter('XMinorTick',1, @(x)isnumeric(x) && isscalar(x));
 
 p.addParameter('XLim',[], @(x)isnumeric(x) && isscalar(x));
-p.addParameter('LineColor','lines');
+p.addParameter('LineColor','aeb01');
 p.addParameter('LineWidth',2);
 p.addParameter('LineStyle','-');
 p.addParameter('CensorLineWidth',2);
@@ -671,7 +678,7 @@ if ~isempty(options.GroupsToUse) % User defined Groups to use
         DATA.GROUPS(i).EventVar = EventVarBin(indx_group);
     end
     
-% If the Groupvariable is a cell vector
+    % If the Groupvariable is a cell vector
 elseif iscell(GroupVar)
     Unique_Groups = unique(GroupVar);
     DATA.numGroups = length(Unique_Groups);
@@ -683,7 +690,7 @@ elseif iscell(GroupVar)
         DATA.GROUPS(i).EventVar = EventVarBin(indx_group);
     end
     
-% If the Groupvariable is a numerical vector
+    % If the Groupvariable is a numerical vector
 elseif (strcmpi('Median',options.CutPoint) || isscalar(options.CutPoint)) && isnumeric(GroupVar)
     if strcmpi('Median',options.CutPoint)
         Cut_Val = median(GroupVar);
@@ -717,7 +724,7 @@ elseif strcmpi('Quartile',options.CutPoint)  && isnumeric(GroupVar)
     DATA.GROUPS(2).TimeVar = TimeVar(indx_Below);
     DATA.GROUPS(2).EventVar = EventVarBin(indx_Below);
     
- % Vector with several cut pints
+    % Vector with several cut pints
 elseif (isvector(options.CutPoint)) && isnumeric(GroupVar)
     CutPointSorted = sort(options.CutPoint,'descend');
     DATA.numGroups = length(CutPointSorted) + 1;
@@ -741,7 +748,7 @@ elseif (isvector(options.CutPoint)) && isnumeric(GroupVar)
     DATA.GROUPS(i+1).GroupName = {sprintf('x <= %g',CutPointSorted(i))};
     DATA.GROUPS(i+1).TimeVar = TimeVar(indx);
     DATA.GROUPS(i+1).EventVar = EventVarBin(indx);
-
+    
     
 end
 
@@ -845,6 +852,92 @@ end
 numEvenTypes = length(unique(EventVar));
 if numEvenTypes > 2
     error('More then 2 event types in the Event variable');
+end
+
+end
+
+function palette = GetMatSurvColorPalette(Id)
+% Get different custom color palettes
+% Valid names are {'JCO','nejm','Lancet','Science','Nature','aeb01'};
+
+if strcmpi(Id,'JCO')
+    palette = [
+        0                   0.450980392156863   0.760784313725490
+        0.937254901960784   0.752941176470588                   0
+        0.525490196078431   0.525490196078431   0.525490196078431
+        0.803921568627451   0.325490196078431   0.298039215686275
+        0.478431372549020   0.650980392156863   0.862745098039216
+        0                   0.235294117647059   0.403921568627451
+        0.560784313725490   0.466666666666667                   0
+        0.231372549019608   0.231372549019608   0.231372549019608
+        0.654901960784314   0.188235294117647   0.188235294117647
+        0.290196078431373   0.411764705882353   0.564705882352941];
+    
+elseif strcmpi(Id,'nejm')
+    palette = [
+        0.737254901960784   0.235294117647059   0.160784313725490
+        0                   0.447058823529412   0.709803921568627
+        0.882352941176471   0.529411764705882   0.152941176470588
+        0.125490196078431   0.521568627450980   0.305882352941176
+        0.470588235294118   0.462745098039216   0.694117647058824
+        0.435294117647059   0.600000000000000   0.678431372549020
+        1.000000000000000   0.862745098039216   0.568627450980392
+        0.933333333333333   0.298039215686275   0.592156862745098];
+    
+elseif strcmpi(Id,'Lancet')
+    palette = [
+        0   0.274509803921569   0.545098039215686
+        0.929411764705882                   0                   0
+        0.258823529411765   0.709803921568627   0.250980392156863
+        0                   0.600000000000000   0.705882352941177
+        0.572549019607843   0.368627450980392   0.623529411764706
+        0.992156862745098   0.686274509803922   0.568627450980392
+        0.678431372549020                   0   0.164705882352941
+        0.678431372549020   0.713725490196078   0.713725490196078
+        0.105882352941176   0.098039215686275   0.098039215686275
+        ];
+elseif strcmpi(Id,'Nature')
+    palette = [
+        0.901960784313726   0.294117647058824   0.207843137254902
+        0.301960784313725   0.733333333333333   0.835294117647059
+        0                   0.627450980392157   0.529411764705882
+        0.235294117647059   0.329411764705882   0.533333333333333
+        0.952941176470588   0.607843137254902   0.498039215686275
+        0.517647058823529   0.568627450980392   0.705882352941177
+        0.568627450980392   0.819607843137255   0.760784313725490
+        0.862745098039216                   0                   0
+        0.494117647058824   0.380392156862745   0.282352941176471
+        0.690196078431373   0.611764705882353   0.521568627450980
+        ];
+elseif strcmpi(Id,'Science')
+    palette = [
+        0.231372549019608   0.286274509803922   0.572549019607843
+        0.933333333333333                   0                   0
+        0                   0.545098039215686   0.270588235294118
+        0.388235294117647   0.094117647058824   0.474509803921569
+        0.372549019607843   0.333333333333333   0.607843137254902
+        0.733333333333333                   0   0.129411764705882
+        0                   0.509803921568627   0.501960784313725
+        0.635294117647059                   0   0.337254901960784
+        0.501960784313725   0.505882352941176   0.501960784313725
+        0.105882352941176   0.098039215686275   0.098039215686275
+        ];
+elseif strcmpi(Id,'aeb01') % My own color palette
+    palette = [
+        0.737       0.235       0.161
+        0           0.451       0.761
+        0.937       0.753       0
+        0.525       0.525       0.525
+        0.125       0.522       0.306
+        0.4940      0.1840      0.5560
+        0.561       0.4667      0
+        0.882       0.529       0.153
+        0.435       0.600       0.678
+        1.000       0.863       0.569
+        0.933       0.298       0.592
+        0.3010      0.7450      0.9330
+        0.231       0.231       0.231
+        ];
 end
 
 end
