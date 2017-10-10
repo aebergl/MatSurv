@@ -98,7 +98,7 @@ load laml_RC_data.mat
 This example also taken from the TCGA laml dataset but we also get the RNAseq gene expression data for the HGF gene. How to get the data from cBioPortal can be found in the MatSurv/Article/MATLAB/get_laml_HGF_gene_data.m script. For this example we will load the data directly
 
 ```matlab
-load laml_RC_data.mat
+load laml_HGF_gene_data.mat
 
 % Using median cut
 [p,fh,stats]=MatSurv(laml_HGF_gene_TimeVar,laml_HGF_gene_EventVar,HGF_gene,'Xstep',12,'InvHR',1);
@@ -166,6 +166,11 @@ load laml_RC_data.mat
   id subjects are removed. (default: false)
 
 KM plot options
+* 'LineColor': Either a matrix of size numLevels-by-3 representing the
+   colormap to be used or a string for a MATLAB colormap (lines, parula,
+   cool, prism) or 'JCO' 'nejm' 'Lancet' 'Science' 'Nature','lines' for a
+   set of Journal dependent palettes or my default 'aeb01' (default:'aeb01')
+
 * 'FlipGroupOrder': Flips the order of the groups in the legend.
   (default: false)
 
