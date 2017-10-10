@@ -201,10 +201,6 @@ KM plot options
 * 'XLim': Vector defining the XLim. Do not affect the log rank test
   (default: automatic)
 
-* 'LineColor': Either a matrix of size numLevels-by-3 representing the
-  colormap to be used or a string for a MATLAB colormap
-  (default: 'lines')
-
 * 'LineWidth': Scalar defining the line width used in the KM-plot
   (Default: 2)
 
