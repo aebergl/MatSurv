@@ -58,6 +58,9 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 % * 'PairWiseP': A true/false for calculating pairwise log rank test
 %   between group pairs, useful if there is more than two groups. (default: false)
 %
+% * 'Print': A true/false value which, if true, survival statistics are 
+%   printed in the command window(default: true)
+%
 % * 'NoWarnings': A true/false value which, if true, no warnings are printed
 %   if subjects are removed. (default: false)
 %
@@ -68,6 +71,7 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 %   colormap to be used or a string for a MATLAB colormap (lines, parula,
 %   cool, prism) or 'JCO' 'nejm' 'Lancet' 'Science' 'Nature','lines' for a
 %   set of Journal dependent palettes or my default 'aeb01' (default:'aeb01')
+%
 % * 'FlipGroupOrder': Flips the order of the groups in the legend.
 %   (default: false)
 %
@@ -94,6 +98,9 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 %
 % * 'InvHR': A true/false value which, if true, the inverted HR value
 %   is displayed on the KM-plot. (default: false)
+%
+% * 'DrawMSL': A true/false value which, if true, a line for the median 
+%   survival time is drawn in the KM-plot. (default: false)
 %
 % * 'XLim': Vector defining the XLim. Do not affect the log rank test
 %   (default: automatic)
@@ -306,9 +313,20 @@ if ~options.NoPlot
     end
     
     % Create stairs
-    S=ones(DATA.numGroups,1);
+    S=gobjects(DATA.numGroups,1);
+    stats.MedianSurvivalTime=ones(DATA.numGroups,1) * NaN;
     for i=1:DATA.numGroups
         S(i)=stairs(axh_KM,DATA.GROUPS(i).KM_ALL(:,1),DATA.GROUPS(i).KM_ALL(:,2),'Color',cMAP(i,:),'Linewidth',options.LineWidth,'LineStyle',LineStyles{i});
+        % Calculate Median Survival time:
+        indx_MST = find((S(i).YData <= 0.5),1);
+        if ~isempty(indx_MST)
+            stats.MedianSurvivalTime(i) = S(i).XData(indx_MST);
+            if options.DrawMSL
+                line(axh_KM,[stats.MedianSurvivalTime(i) stats.MedianSurvivalTime(i)], [0.5 0],'LineStyle','--','Linewidth',1.5,'Color','k');
+                line(axh_KM,[0 stats.MedianSurvivalTime(i)], [0.5 0.5],'LineStyle','--','Linewidth',1.5,'Color','k');
+                
+            end
+        end
         if ~isempty(DATA.GROUPS(i).Censored_Points)
             % Draw marks for censored points
             line(axh_KM,[DATA.GROUPS(i).Censored_Points(:,1)'; DATA.GROUPS(i).Censored_Points(:,1)'],...
@@ -437,6 +455,21 @@ else
     fh = [];
 end
 
+if options.Print
+    fprintf('\n')
+    fprintf('p = %.3g\n',stats.p)
+    if options.CalcHR
+        if options.InvHR
+            fprintf('HR = %.3g (%.3g - %.3g)\n',stats.HR_Inv,stats.low95_Inv, stats.up95_Inv);
+        else
+            fprintf('HR = %.3g (%.3g - %.3g)\n',stats.HR,stats.low95, stats.up95);
+        end
+    end
+    for i = 1: DATA.numGroups
+        fprintf('Median Survival Time: (%s) = %g\n',stats.GroupNames{i},stats.MedianSurvivalTime(i))
+    end
+    fprintf('\n')
+end
 % Define output variables dependent of varargout
 if nargout > 0
     varargout{1} = p;
@@ -466,6 +499,7 @@ p.addParameter('FlipColorOrder',0);
 p.addParameter('NoWarnings',false);
 p.addParameter('TimeUnit','Months');
 p.addParameter('PairWiseP',0);
+p.addParameter('Print',1);
 
 % Figure Options
 p.addParameter('KM_position',[0.25 0.4 0.70 0.45]);
@@ -476,6 +510,7 @@ p.addParameter('BaseFontSize',16);
 % KM plot options
 p.addParameter('DispP',1);
 p.addParameter('DispHR',1);
+p.addParameter('DrawMSL',0);
 p.addParameter('InvHR',0);
 p.addParameter('Xstep',[], @(x)isnumeric(x) && isscalar(x));
 p.addParameter('XTicks',[], @(x)isnumeric(x) && isvector(x));
@@ -512,6 +547,10 @@ p.addParameter('RT_Color','same');
 p.addParameter('RT_YLabel',1);
 p.addParameter('RT_Title',[]);
 p.addParameter('RT_TitleOptions',cell(0,0));
+
+%Others
+p.addParameter('CalcHR',1);
+
 
 parse(p,varargin{:});
 params = p.Results;
@@ -554,6 +593,7 @@ end
 
 d = sum(mf(:,1:end-1)-ef(:,1:end-1))';
 
+stats.GroupNames = [DATA.GROUPS.GroupName]';
 % Caclulate Hazard Ratio
 if DATA.numGroups == 2
     stats.HR = (sum(mf(:,1)) / sum(ef(:,1))) / (sum(mf(:,2)) / sum(ef(:,2)));
