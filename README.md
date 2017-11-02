@@ -26,7 +26,7 @@ The following code loads the data from "Freireich, EJ et al. 1963, Blood, 21, 69
 [p,fh,stats]=MatSurv([], [], [],'Xstep',4,'Title','MatSurv KM-Plot');
 
 ```
-<img src="/html/Example_01.png" alt="MatSurv example" width="600">
+<img src="/figures/Example_01.png" alt="MatSurv example" width="600">
  
 ## Using MatSurv ##
 
@@ -79,7 +79,7 @@ In the example below we show how we can change some of the properties of the KM-
 'LineWidth',3,'CensorLineColor','k','RT_Title','Risk Table');
 
 ```
-<img src="/html/Example_02.png" alt="MatSurv example" width="600">
+<img src="/figures/Example_02.png" alt="MatSurv example" width="600">
 
 ### Example with multiple groups ###
 
@@ -91,7 +91,7 @@ load laml_RC_data.mat
 [p,fh,stats]=MatSurv(laml_RC_TimeVar, laml_RC_EventVar,  laml_RC_GroupVar,...
 'GroupsToUse', {'Good','Intermediate','Poor'},'Xstep',24);
 ```
-<img src="/html/laml_Risk_Cyto.png" alt="Multiple groups MatSurv example" width="600">
+<img src="/figures/laml_Risk_Cyto.png" alt="Multiple groups MatSurv example" width="600">
 
 ### Example with gene expression data ###
 
@@ -112,17 +112,17 @@ load laml_HGF_gene_data.mat
 ```
 #### Median cut ####
 
-<img src="/html/laml_HGF_gene_Median.png" alt="Median MatSurv example" width="600">
+<img src="/figures/laml_HGF_gene_Median.png" alt="Median MatSurv example" width="600">
 
 
 #### Quartile ####
 
-<img src="/html/laml_HGF_gene_Quartile.png" alt="Quartile MatSurv example" width="600">
+<img src="/figures/laml_HGF_gene_Quartile.png" alt="Quartile MatSurv example" width="600">
 
 
 #### Two cut points ####
 
-<img src="/html/laml_HGF_gene_TwoCutPoints.png" alt="Two Cut points MatSurv example" width="600">
+<img src="/figures/laml_HGF_gene_TwoCutPoints.png" alt="Two Cut points MatSurv example" width="600">
 
 
 
