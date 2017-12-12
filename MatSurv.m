@@ -863,7 +863,7 @@ rem_indx_time = ( isnan(TimeVar) | (TimeVar < options.TimeMin) );
 if isnumeric(EventVar) || islogical(EventVar)
     rem_indx_event = isnan(EventVar);
 elseif iscell(EventVar)
-    rem_indx_event = (cellfun('isempty',EventVar));
+    rem_indx_event = (cellfun('isempty',EventVar) | strcmpi('[Not Available]',EventVar) | strcmpi('NA',EventVar));
 end
 % Check Group variable for missing data and/or empty cells and cells with NA
 if isnumeric(GroupVar)
