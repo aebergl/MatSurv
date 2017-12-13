@@ -216,6 +216,11 @@ if (length(TimeVar) ~= length(EventVar)) || (length(TimeVar) ~= length(GroupVar)
     error('TimeVar, EventVar & GroupVar must all have equal length');
 end
 
+% Check for MATLAB version, currently MatSurv only work with 9.1 (2016b) and later
+if verLessThan('matlab','9.1')
+    error('MatSurv do not work with this version of MATLAB');
+end
+
 %Parse input and set default values
 options = MatSurvParseInput(varargin{:});
 
