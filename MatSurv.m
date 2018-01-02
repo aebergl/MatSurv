@@ -64,6 +64,10 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 % * 'NoWarnings': A true/false value which, if true, no warnings are printed
 %   if subjects are removed. (default: false)
 %
+% * 'MedianLess': By default 'x < median' is used for median cut, but if false 
+%   'x > median' is used instead, only affect the results when there
+%   is an odd number of samples (default: true)
+%
 %
 % KM plot options
 %
@@ -505,6 +509,7 @@ p.addParameter('NoWarnings',false);
 p.addParameter('TimeUnit','Months');
 p.addParameter('PairWiseP',0);
 p.addParameter('Print',1);
+p.addParameter('MedianLess',1);
 
 % Figure Options
 p.addParameter('KM_position',[0.25 0.4 0.70 0.45]);
@@ -745,14 +750,23 @@ elseif (strcmpi('Median',options.CutPoint) || isscalar(options.CutPoint)) && isn
         DATA.GroupType = 'Fixed value';
     end
     DATA.numGroups = 2;
-    indx_Above  = (GroupVar > Cut_Val);
-    indx_Below  = (GroupVar <= Cut_Val);
     
-    DATA.GROUPS(1).GroupName = {sprintf('x > %g',Cut_Val)};
+    if options.MedianLess
+        indx_Below  = (GroupVar < Cut_Val);
+        indx_Above = ~indx_Below;
+        DATA.GROUPS(1).GroupName = {sprintf('x >= %g',Cut_Val)};
+        DATA.GROUPS(2).GroupName = {sprintf('x < %g',Cut_Val)};
+    else
+        indx_Above  = (GroupVar > Cut_Val);
+        indx_Below  = ~indx_Above;
+        DATA.GROUPS(1).GroupName = {sprintf('x > %g',Cut_Val)};
+        DATA.GROUPS(2).GroupName = {sprintf('x <= %g',Cut_Val)};
+    end
+    
     DATA.GROUPS(1).TimeVar = TimeVar(indx_Above);
     DATA.GROUPS(1).EventVar = EventVarBin(indx_Above);
     
-    DATA.GROUPS(2).GroupName = {sprintf('x <= %g',Cut_Val)};
+    
     DATA.GROUPS(2).TimeVar = TimeVar(indx_Below);
     DATA.GROUPS(2).EventVar = EventVarBin(indx_Below);
     
