@@ -58,13 +58,13 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 % * 'PairWiseP': A true/false for calculating pairwise log rank test
 %   between group pairs, useful if there is more than two groups. (default: false)
 %
-% * 'Print': A true/false value which, if true, survival statistics are 
+% * 'Print': A true/false value which, if true, survival statistics are
 %   printed in the command window(default: true)
 %
 % * 'NoWarnings': A true/false value which, if true, no warnings are printed
 %   if subjects are removed. (default: false)
 %
-% * 'MedianLess': By default 'x < median' is used for median cut, but if false 
+% * 'MedianLess': By default 'x < median' is used for median cut, but if false
 %   'x > median' is used instead, only affect the results when there
 %   is an odd number of samples (default: true)
 %
@@ -103,7 +103,7 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 % * 'InvHR': A true/false value which, if true, the inverted HR value
 %   is displayed on the KM-plot. (default: false)
 %
-% * 'DrawMSL': A true/false value which, if true, a line for the median 
+% * 'DrawMSL': A true/false value which, if true, a line for the median
 %   survival time is drawn in the KM-plot. (default: false)
 %
 % * 'XLim': Vector defining the XLim. Do not affect the log rank test
@@ -269,8 +269,21 @@ if options.PairWiseP
     end
 end
 
-% Creat KM-Plot
-if ~options.NoPlot
+% Calculate median survival time if no plot is created 
+if options.NoPlot
+    stats.MedianSurvivalTime=ones(DATA.numGroups,1) * NaN;
+    for i=1:DATA.numGroups
+        [xb,yb] = stairs(DATA.GROUPS(i).KM_ALL(:,1),DATA.GROUPS(i).KM_ALL(:,2));
+        % Calculate Median Survival time:
+        indx_MST = find((yb <= 0.5),1);
+        if ~isempty(indx_MST)
+            stats.MedianSurvivalTime(i) = xb(indx_MST);
+        end
+    end
+    fh = [];
+    
+else % Creat KM-Plot
+    
     % Create Figure Window
     fh=figure('Name','MatSurv KM-Plot','Color','w','Tag','MatSurv KM-Plot figure');
     
@@ -333,7 +346,6 @@ if ~options.NoPlot
             if options.DrawMSL
                 line(axh_KM,[stats.MedianSurvivalTime(i) stats.MedianSurvivalTime(i)], [0.5 0],'LineStyle','--','Linewidth',1.5,'Color','k');
                 line(axh_KM,[0 stats.MedianSurvivalTime(i)], [0.5 0.5],'LineStyle','--','Linewidth',1.5,'Color','k');
-                
             end
         end
         if ~isempty(DATA.GROUPS(i).Censored_Points)
@@ -460,8 +472,6 @@ if ~options.NoPlot
             ht.VerticalAlignment='middle';
         end
     end
-else
-    fh = [];
 end
 
 if options.Print
