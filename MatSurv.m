@@ -35,9 +35,9 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 %
 % * 'CutPoint': Either a string or scalar/vector with cut points to be used
 %   for defining groups based on a continuous 'GroupVar' input variable
-%   Allowed names are: 'Median' or 'Quartile'
+%   Allowed names are: 'Median', 'Quartile' or 'Tertile'
 %   If a scalar or vector is given the groups will be defined based on the
-%   cut points. (default: 'median')
+%   cut points. (default: 'Median')
 %
 % * 'GroupsToUse': Cell array defining what groups to use from the GroupVar
 %   variable. Works only if GroupVar is a cell array. (default: all groups are used)
@@ -51,7 +51,7 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 % * 'TimeMin': Scalar defining minimum valid time point. Subjects with time
 %   values below this will be removed. (default: 0)
 %
-% * 'TimeMAx': Scalar value defining righ censoring time. Subjects with
+% * 'TimeMax': Scalar value defining righ censoring time. Subjects with
 %   TimeVar > TimeMax will be set to TimeMax and considered as censored.
 %   (default: [])
 %
@@ -783,22 +783,41 @@ elseif (strcmpi('Median',options.CutPoint) || isscalar(options.CutPoint)) && isn
 elseif strcmpi('Quartile',options.CutPoint)  && isnumeric(GroupVar)
     Cut_Val = prctile(GroupVar,[25 75]);
     DATA.GroupType = 'Quartile';
-    indx_Below  = (GroupVar <= Cut_Val(1));
-    indx_Above = (GroupVar >= Cut_Val(2));
+    indx_Below  = (GroupVar < Cut_Val(1));
+    indx_Above = (GroupVar > Cut_Val(2));
     DATA.numGroups = 2;
-    DATA.GROUPS(1).GroupName = {sprintf('x >= %g',Cut_Val(2))};
+    DATA.GROUPS(1).GroupName = {sprintf('x > %g',Cut_Val(2))};
     DATA.GROUPS(1).TimeVar = TimeVar(indx_Above);
     DATA.GROUPS(1).EventVar = EventVarBin(indx_Above);
-    DATA.GROUPS(2).GroupName = {sprintf('x <= %g',Cut_Val(1))};
+    DATA.GROUPS(2).GroupName = {sprintf('x < %g',Cut_Val(1))};
     DATA.GROUPS(2).TimeVar = TimeVar(indx_Below);
     DATA.GROUPS(2).EventVar = EventVarBin(indx_Below);
+
+elseif strcmpi('Tertile',options.CutPoint)  && isnumeric(GroupVar)
+    Cut_Val = prctile(GroupVar,[100/3 100/1.5]);
+    DATA.GroupType = 'Tertile';
+    indx_Below  = (GroupVar < Cut_Val(1));
+    indx_Above = (GroupVar > Cut_Val(2));
+    indx_Between = ~(indx_Below | indx_Above);
+    DATA.numGroups = 3;
+    %High
+    DATA.GROUPS(1).GroupName = {sprintf('x > %g',Cut_Val(2))};
+    DATA.GROUPS(1).TimeVar = TimeVar(indx_Above);
+    DATA.GROUPS(1).EventVar = EventVarBin(indx_Above);
+    %Medium
+    DATA.GROUPS(2).GroupName = {sprintf('%g < x < %g',Cut_Val(1),Cut_Val(2))};
+    DATA.GROUPS(2).TimeVar = TimeVar(indx_Between);
+    DATA.GROUPS(2).EventVar = EventVarBin(indx_Between);
+    %Low
+    DATA.GROUPS(3).GroupName = {sprintf('x < %g',Cut_Val(1))};
+    DATA.GROUPS(3).TimeVar = TimeVar(indx_Below);
+    DATA.GROUPS(3).EventVar = EventVarBin(indx_Below);
     
     % Vector with several cut pints
 elseif (isvector(options.CutPoint)) && isnumeric(GroupVar)
     CutPointSorted = sort(options.CutPoint,'descend');
     DATA.numGroups = length(CutPointSorted) + 1;
     DATA.GroupType = 'Cut Points';
-    
     % For samples above
     indx_Above  = (GroupVar > CutPointSorted(1));
     DATA.GROUPS(1).GroupName = {sprintf('x > %g',CutPointSorted(1))};
@@ -807,7 +826,7 @@ elseif (isvector(options.CutPoint)) && isnumeric(GroupVar)
     % For samples inbetween cut points
     for i = 1:length(CutPointSorted) - 1
         indx  = (GroupVar > CutPointSorted(i+1) & GroupVar <= CutPointSorted(i));
-        DATA.GROUPS(i+1).GroupName = {sprintf('%g > x <= %g',CutPointSorted(i+1),CutPointSorted(i))};
+        DATA.GROUPS(i+1).GroupName = {sprintf('%g < x <= %g',CutPointSorted(i+1),CutPointSorted(i))};
         DATA.GROUPS(i+1).TimeVar = TimeVar(indx);
         DATA.GROUPS(i+1).EventVar = EventVarBin(indx);
     end
@@ -817,8 +836,6 @@ elseif (isvector(options.CutPoint)) && isnumeric(GroupVar)
     DATA.GROUPS(i+1).GroupName = {sprintf('x <= %g',CutPointSorted(i))};
     DATA.GROUPS(i+1).TimeVar = TimeVar(indx);
     DATA.GROUPS(i+1).EventVar = EventVarBin(indx);
-    
-    
 end
 
 % Hazard ration can only be calculated if there is two groups
