@@ -678,7 +678,8 @@ end
 function [KM_Events, KM_ALL, Censored_Points] = MatSurvCalculateTables(tf,TimeVar,EventVar,tf_out)
 
 % Calculate number  of samples for each time point including censored
-mf = sum(repmat(TimeVar,1,length(tf)) == repmat(tf',length(TimeVar),1))';
+% Thanks to ashrafinia for identifying and fixing bug if there is only one group member
+mf = sum(repmat(TimeVar,1,length(tf)) == repmat(tf',length(TimeVar),1),1)';
 
 %Calculate number of samples left at each time point
 mf_cumsum = cumsum(mf);
@@ -688,7 +689,7 @@ nf(2:end) = nf(2:end) - mf_cumsum(1:end-1);
 % Find censored points
 indx_censor = (EventVar == 0);
 tfq = unique(TimeVar(indx_censor));
-mfq = sum(repmat(TimeVar(indx_censor),1,length(tfq)) == repmat(tfq',length(TimeVar(indx_censor)),1))' ;
+mfq = sum(repmat(TimeVar(indx_censor),1,length(tfq)) == repmat(tfq',length(TimeVar(indx_censor)),1),1)'; 
 
 % Find time points where there are censored data
 [~,tf_indx,~]=intersect(tf,tfq,'stable');
