@@ -14,8 +14,10 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 %
 % * 'EventVar' is a vector or cell array defining events or censored
 %   observation. Events are defined with a 1 and censored point with a 0. By
-%   default 'Dead', 'Deceased', 'Relapsed', 'Yes' are considered as events.
-%   'Alive', 'Living', 'Not Relapsed', 'DiseaseFree', 'No' are considers as censored
+%   default 'Dead', 'Deceased', 'Relapsed', 'Yes', 'Event' 'Progression' & 
+%   'Progressed' are considered as events.
+%   'Alive', 'Living', 'Not Relapsed', 'DiseaseFree', 'No' 'NoEvent' 
+%   'Censored' 'NoProgression' are considers as censored
 %   'EventDefinition' can be used to define other types of events
 %
 % * 'GroupVar' is a vector or cell array defining the different groups.
@@ -873,8 +875,14 @@ elseif iscell(EventVar)
             error('Event variable do not match event type defined in options.EventDefinition')
         end
     else % Set values based on common event types such as dead/alive
-        indx_Event = strcmpi('dead',EventVar) | strcmpi('DECEASED',EventVar) | strcmpi('Relapsed',EventVar) |  strcmpi('Yes',EventVar) ;
-        indx_NoEvent = strcmpi('alive',EventVar) | strcmpi('LIVING',EventVar) | strcmpi('NotRelapsed',EventVar) | strcmpi('DiseaseFree',EventVar)| strcmpi('No',EventVar);
+        indx_Event = strcmpi('Dead',EventVar) | strcmpi('Deceased',EventVar) | strcmpi('Relapsed',EventVar)...
+                    |  strcmpi('Yes',EventVar) | strcmpi('Event',EventVar) | strcmpi('Progression',EventVar)...
+                    | strcmpi('Progressed',EventVar);
+        
+        indx_NoEvent = strcmpi('Alive',EventVar) | strcmpi('Living',EventVar) | strcmpi('NotRelapsed',EventVar)...
+                    | strcmpi('DiseaseFree',EventVar) | strcmpi('No',EventVar) | strcmpi('Censored',EventVar)...
+                    | strcmpi('NoProgression',EventVar) | strcmpi('NoEvent',EventVar);
+        
         if sum(indx_Event) + sum(indx_NoEvent) == length(EventVar)
             EventVarBin(indx_Event) = 1;
             EventVarBin(indx_NoEvent) = 0;
