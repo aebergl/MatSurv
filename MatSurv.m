@@ -657,7 +657,8 @@ end
 
 %Calculate Chi2
 stats.Chi2 = d'/V*d;
-p = 1 - gammainc(stats.Chi2/2,(DATA.numGroups-1)/2);
+%p = 1 - gammainc(stats.Chi2/2,(DATA.numGroups-1)/2);
+p = gammainc(stats.Chi2/2,(DATA.numGroups-1)/2,'upper');
 stats.p = p;
 
 end
