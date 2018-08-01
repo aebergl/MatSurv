@@ -415,9 +415,9 @@ else % Creat KM-Plot
         txt_str(1) = {sprintf('p = %.3g',p)};
         if options.DispHR
             if options.InvHR
-                txt_str(2) = {sprintf('HR = %.3g (%.3g - %.3g)',stats.HR_Inv,stats.low95_Inv, stats.up95_Inv)};
+                txt_str(2) = {sprintf('HR = %.3g (%.3g - %.3g)',stats.HR_logrank_Inv, stats.HR_95_CI_logrank_Inv(1), stats.HR_95_CI_logrank_Inv(2))};
             else
-                txt_str(2) = {sprintf('HR = %.3g (%.3g - %.3g)',stats.HR,stats.low95, stats.up95)};
+                txt_str(2) = {sprintf('HR = %.3g (%.3g - %.3g)',stats.HR_logrank, stats.HR_95_CI_logrank(1), stats.HR_95_CI_logrank(2))};
             end
         end
         text(axh_KM,Nudge_X,0.1,txt_str,'FontSize',options.BaseFontSize + options.PvalFontSize,'tag','p-value')
@@ -478,12 +478,12 @@ end
 
 if options.Print
     fprintf('\n')
-    fprintf('p = %.3g\n',stats.p)
+    fprintf('p = %.3g\n',stats.p_MC)
     if options.CalcHR
         if options.InvHR
-            fprintf('HR = %.3g (%.3g - %.3g)\n',stats.HR_Inv,stats.low95_Inv, stats.up95_Inv);
+            fprintf('HR = %.3g (%.3g - %.3g)\n',stats.HR_logrank_Inv, stats.HR_95_CI_logrank_Inv(1), stats.HR_95_CI_logrank_Inv(2));
         else
-            fprintf('HR = %.3g (%.3g - %.3g)\n',stats.HR,stats.low95, stats.up95);
+            fprintf('HR = %.3g (%.3g - %.3g)\n',stats.HR_logrank, stats.HR_95_CI_logrank(1), stats.HR_95_CI_logrank(2));
         end
     end
     for i = 1: DATA.numGroups
@@ -615,21 +615,10 @@ end
 
 d = sum(mf(:,1:end-1)-ef(:,1:end-1))';
 
-stats.GroupNames = [DATA.GROUPS.GroupName]';
-% Caclulate Hazard Ratio
-if DATA.numGroups == 2
-    stats.HR = (sum(mf(:,1)) / sum(ef(:,1))) / (sum(mf(:,2)) / sum(ef(:,2)));
-    stats.low95 = exp((log(stats.HR) - 1.96 * sqrt(1/sum(ef(:,1)) + 1/sum(ef(:,2)))));
-    stats.up95 = exp((log(stats.HR) + 1.96 * sqrt(1/sum(ef(:,1)) + 1/sum(ef(:,2)))));
-    stats.HR_Inv = 1/stats.HR;
-    stats.low95_Inv = 1/stats.up95;
-    stats.up95_Inv = 1/stats.low95;
-end
-
 %Calculate Variance
 Var_OE=zeros(n,DATA.numGroups-1);
 for i = 1:DATA.numGroups-1
-    Var_OE(:,i) = (nf(:,i) .* (nf_sum - nf(:,i)) .* mf_sum .*(nf_sum - mf_sum)) ./ (nf_sum.^2 .* (nf_sum -1));
+    Var_OE(:,i) = (nf(:,i) .* (nf_sum - nf(:,i)) .* mf_sum .*(nf_sum - mf_sum)) ./ (nf_sum.^2 .* (nf_sum - 1));
 end
 Var_OE(isnan(Var_OE)) = 0;
 Var_OE_sum = sum(Var_OE);
@@ -655,11 +644,33 @@ else % Special case for 2 groups
     V = Var_OE_sum;
 end
 
+% Mantel Cox
 %Calculate Chi2
-stats.Chi2 = d'/V*d;
+Chi2 = d'/V*d;
+
 %p = 1 - gammainc(stats.Chi2/2,(DATA.numGroups-1)/2);
-p = gammainc(stats.Chi2/2,(DATA.numGroups-1)/2,'upper');
-stats.p = p;
+p = gammainc(Chi2/2,(DATA.numGroups-1)/2,'upper');
+
+% Create stats output
+stats.GroupNames = [DATA.GROUPS.GroupName]';
+stats.p_MC = p;
+stats.Chi2_MC = Chi2';
+
+% Caclulate Hazard Ratio
+
+if DATA.numGroups == 2
+    stats.HR_logrank = (sum(mf(:,1)) / sum(ef(:,1))) / (sum(mf(:,2)) / sum(ef(:,2)));
+    stats.HR_95_CI_logrank = [exp((log(stats.HR_logrank) - 1.96 * sqrt(1/sum(ef(:,1)) + 1/sum(ef(:,2))))), exp((log(stats.HR_logrank) + 1.96 * sqrt(1/sum(ef(:,1)) + 1/sum(ef(:,2)))))];
+    stats.HR_logrank_Inv = 1/stats.HR_logrank;
+    stats.HR_95_CI_logrank_Inv = flip(1 ./ stats.HR_95_CI_logrank);
+    L = (sum(mf(:,1)) - sum(ef(:,1))) / Var_OE_sum;
+    stats.HR_MH  = exp(L);
+    stats.HR_95_CI_MH = [exp(L - 1.96/sqrt(Var_OE_sum)), exp(L + 1.96/sqrt(Var_OE_sum))];
+    stats.HR_MH_Inv  = 1 / stats.HR_MH;
+    stats.HR_95_CI_MH_Inv = flip(1 ./ stats.HR_95_CI_MH);
+   
+end
+
 
 end
 
