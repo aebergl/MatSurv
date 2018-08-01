@@ -1,0 +1,50 @@
+---
+title: "MatSurv"
+authors: 
+  - name: Jordan H Creed
+    affiliation: 1
+  - name: Travis A Gerke
+    affiliation: 1
+  - name: Anders E Berglund
+    affiliation: 1
+affiliations: 
+  - name: Moffitt Cancer Center
+    index: 1
+bibliography: matsurv_bib.bib
+# output: md_document
+---
+
+# Summary
+
+Survival analysis is a key tool in bioinformatics today. Common aspects of survival analysis include log rank tests, Hazard Ratios (HR) and Kaplan-Meier (KM) curves. KM-curves are used to display suvival durations between two groups and give users a rough estimate of survival probability at a given time; log rank tests are used to compare suvival durations between groups and HRs is a ratio of the hazard rates between groups. MATLAB (MATLAB 2018A) is currently missing functions to easily create a KM-plot with accompanying risk-table or with multiple groups.  Furthermore, MATLAB does not have a built-in log rank test, neither is one available in any of the toolboxes, including the Statistics and Machine Learning Toolbox. Our goal for MatSurv is to provide an easy-to-use function that creates a publication quality KM-plot, with a risk table, and produces accurate statistics for multiple groups. Users can also easily modify the appearance of the created KM figure. The graphics were inspried by the ``survminer`` R-package [@survminer]. 
+
+MatSurv uses the Mantel-Cox, sometimes called the Mantel-Haenszel, log rank test. The HR calculations use the log rank approach, HR = (Oa/Ea)/(Ob/Eb), where Oa & Ob are the observed events in each group and Ea & Eb are the number of expected events.  This will give slightly different results when compared to the Mantel-Haneszel or Cox regression approach, which is commonly used in R. 
+
+In order to use MatSurv, simply put MatSurv.m in any directory of your choice and make sure it is added to your path. At a minimum, the user should provide ``TimeVar``, a vector with numeric time to event, either observed or censored, ``EventVar``, a vector or cell array defining events or censoring, and ``GroupVar``, a vector or cell array defining the comparison groups (see example code below). 
+
+```matlab
+load laml_RC_data.mat
+
+[p,fh,stats]=MatSurv(laml_RC_TimeVar, laml_RC_EventVar,  laml_RC_GroupVar,...
+'GroupsToUse', {'Good','Intermediate','Poor'},'Xstep',24);
+```
+
+The function returns three pieces ``p``, the log rank p-value, ``fh``, the KM-plot figure handle, and ``stats``, which are additional statistics from the log rank test. The user can further customize the style of their KM-plot (line colors, labels, ticks, etc.) by making changes to the figure handle. 
+
+The results from the MatSurv log rank test have been compared against both SAS and R and found to return the same results (Table 1). 
+
+Data | Groups |  MatSurv  | MatSurv |  SAS    | SAS | Survminer | Survminer |
+---  | ---    | :---:  | :---:   | :---:    | :---: | :---:       | :---:       |   
+     |     |  | **chi-sq**  | **p**   | **chi-sq** | **p** | **chi-sq**    | **p**  |
+Freireich | Groups | 16.79 | 4.17E-5 | 16.79 | 4.17E-5 | 16.8 | 4.17E-5 |
+LAML | RISK_CYTO | 24.85 | 4.02E-6 | 24.85 | < 0.001 | 24.8 | 4.02E-6 |
+LAML | HGF Median | 6.63 | 0.01 | 6.63 | 0.01 | 6.6 | 0.01 |
+LAML | HGF Quartiles | 13.01 | 3.09E-4 | 13.01 | 3.09E-4 |  13.0 | 30.9E-4 |
+LAML | HGF [6,12] | 16.78 | 2.27 E-4 | 16.78 | 2.27E-4 | 16.8 | 2.27E-4 | 
+
+![](matSurv_comp.png)
+
+
+# Acknowledgements
+
+# References
