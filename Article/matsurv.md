@@ -23,10 +23,10 @@ Use
 
 MatSurv uses the Mantel-Cox, sometimes called the Mantel-Haenszel, log-rank test. Users have two options for calculating HRs: the log-rank or
 Mantel-Haneszel approach. In the log-rank approach, HR =
-(O<sub>a</sub>/E<sub>a</sub>)/(O<sub>b</sub>E<sub>b</sub>), where Oa & Ob are the observed events in each group and
-Ea & Eb are the number of expected events. In the Mantel-Haenszel
-approach, HR = exp((O1-E1)/V), where O1 is the number of observed events
-in a group, E1 is the expected number of events in the same group and V
+(O<sub>a</sub>/E<sub>a</sub>)/(O<sub>b</sub>E<sub>b</sub>), where O<sub>a</sub> & O<sub>b</sub> are the observed events in each group and
+E<sub>a</sub> & E<sub>b</sub> are the number of expected events. In the Mantel-Haenszel
+approach, HR = exp((O<sub>1</sub>-E<sub>1</sub>)/V), where O<sub>1</sub> is the number of observed events
+in a group, E<sub>1</sub> is the expected number of events in the same group and V
 is the total variance. Results from the log-rank approach will give
 slightly different results when compared to the Mantel-Haneszel or Cox
 regression approach, which is commonly used in R.
@@ -75,12 +75,14 @@ are shown below as well as the output from all 3 statistical programs
     time OS_MONTHS*Surv(0);
     strata RISK_CYTO/test=logrank;
     run;
+### MatSurv
+    CAN WE PLACE THE MatSurv CODE HERE?
 
 ![](figure_09272018.png)
 
 The results from the MatSurv have been compared against both SAS and R
-and found to return the similar estimates. The Chi-Sq value and p-values
-for a log rank test in MatSurv, SAS and R are provided below(Table 1).
+and found to return similar estimates. The Chi-Sq value and p-values
+for a log-rank test in MatSurv, SAS and R are provided below (Table 1).
 
 <table class="table table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <caption>
@@ -242,7 +244,7 @@ HGF Quartiles
 LAML
 </td>
 <td style="text-align:left;">
-HGF \[6,12\]
+HGF [6,12]
 </td>
 <td style="text-align:left;">
 16.78
