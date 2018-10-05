@@ -59,7 +59,7 @@ completely on base MATLAB functions.
 Comparison
 ==========
 
-The MatSurv output is comparable to that from the `proc lifetest` in SAS
+The MatSurv output is comparable to that from `proc lifetest` in SAS
 and `ggsurvplot` in R. Code for reproducing similar output in R and SAS
 are shown below as well as the output from all 3 statistical programs
 (R, SAS and MatSurv).
