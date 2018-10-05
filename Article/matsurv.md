@@ -38,11 +38,8 @@ observed or censored, `EventVar`, a vector or cell array defining events
 or censoring, and `GroupVar`, a vector or cell array defining the
 comparison groups (see example code below).
 
-    load laml_RC_data.mat
-
-    [p,fh,stats]=MatSurv(laml_RC_TimeVar, laml_RC_EventVar,  laml_RC_GroupVar,...
-    'GroupsToUse', {'Good','Intermediate','Poor'},'Xstep',24);
-
+    [p,fh,stats]=MatSurv([], [], [],'Xstep',4,'Title','MatSurv KM-Plot');
+    
 The function returns three pieces `p`, the log rank p-value, `fh`, the
 KM-plot figure handle, and `stats`, which are additional statistics from
 the log rank test. The user can further customize the style of their
@@ -76,7 +73,10 @@ are shown below as well as the output from all 3 statistical programs
     strata RISK_CYTO/test=logrank;
     run;
 ### MatSurv
-    CAN WE PLACE THE MatSurv CODE HERE?
+      load laml_RC_data.mat
+
+    [p,fh,stats]=MatSurv(laml_RC_TimeVar, laml_RC_EventVar,  laml_RC_GroupVar,...
+    'GroupsToUse', {'Good','Intermediate','Poor'},'Xstep',24);
 
 ![](figure_09272018.png)
 
