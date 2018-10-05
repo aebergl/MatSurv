@@ -1,19 +1,19 @@
 Summary
 =======
 
-Survival analysis is a key tool in bioinformatics today. Common aspects
-of survival analysis include log rank tests, Hazard Ratios (HR) and
-Kaplan-Meier (KM) curves. KM-curves are used to display suvival
-durations between two groups and give users a rough estimate of survival
-probability at a given time; log rank tests are used to compare suvival
-durations between groups and HRs is a ratio of the hazard rates between
-groups. MATLAB (MATLAB 2018A) is currently missing functions to easily
-create a KM-plot with accompanying risk-table or with multiple groups.
-Furthermore, MATLAB does not have a built-in log rank test; neither is
+Survival analysis is a statistical tool for evaluating time-to-event data that is widely applied across research disciplines. Commonly reported elements
+of survival analyses include log-rank tests, hazard ratios (HR), and
+Kaplan-Meier (KM) curves. KM-curves are used to compare suvival
+durations between two groups and give users a particular estimate of survival
+probability at a given time; log-rank tests are used to conduct statistical inference on suvival
+durations between groups; and HRs provide a ratio of the hazard rates between
+groups. MATLAB (MATLAB 2018A) currently lacks functions to easily
+create KM-plots with accompanying risk tables.
+Furthermore, MATLAB does not have a built-in log-rank test, nor is
 one available in any of the existing toolboxes, including the Statistics
 and Machine Learning Toolbox. Our goal for MatSurv is to provide an
-easy-to-use tool that creates a publication quality KM-plot, with a risk
-table, and produces accurate statistics for multiple groups. In
+easy-to-use tool that creates a publication quality KM-plots with corresponding risk
+tables. The statistical procedures built into MatSurv can be used to compare two or multiple groups. In
 addition, MatSurv allows the user to easily modify the appearance of the
 created figure. The graphics were inspried by the `survminer` R-package
 (Kassambara 2018).
@@ -21,14 +21,13 @@ created figure. The graphics were inspried by the `survminer` R-package
 Use
 ===
 
-MatSurv uses the Mantel-Cox, sometimes called the Mantel-Haenszel, log
-rank test. Users have two options for calculating HRs: the log rank or
-Mantel-Haneszel approach. In the log rank approach, HR =
-(Oa/Ea)/(Ob/Eb), where Oa & Ob are the observed events in each group and
+MatSurv uses the Mantel-Cox, sometimes called the Mantel-Haenszel, log-rank test. Users have two options for calculating HRs: the log-rank or
+Mantel-Haneszel approach. In the log-rank approach, HR =
+(O<sub>a</sub>/E<sub>a</sub>)/(O<sub>b</sub>E<sub>b</sub>), where Oa & Ob are the observed events in each group and
 Ea & Eb are the number of expected events. In the Mantel-Haenszel
 approach, HR = exp((O1-E1)/V), where O1 is the number of observed events
 in a group, E1 is the expected number of events in the same group and V
-is the total variance. Results from the logrank approach will give
+is the total variance. Results from the log-rank approach will give
 slightly different results when compared to the Mantel-Haneszel or Cox
 regression approach, which is commonly used in R.
 
@@ -64,13 +63,11 @@ The MatSurv output is comparable to that from the `proc lifetest` in SAS
 and `ggsurvplot` in R. Code for reproducing similar output in R and SAS
 are shown below as well as the output from all 3 statistical programs
 (R, SAS and MatSurv).
-
-
+### R
     fit <- survfit(survobj ~ RISK_CYTO, data=dat)
 
     ggsurvplot(fit, risk.table=TRUE, pval=TRUE, risk.table.y.text.col=TRUE, risk.table.y.text=FALSE, break.time.by=24)
-
-
+### SAS
     proc lifetest data=lamlv2(where=(RISK_CYTO ^= 'N.D.')) 
     intervals=(0 to 120 by 24)
     timelist = (0 to 120 by 24) 
