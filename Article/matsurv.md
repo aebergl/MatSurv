@@ -78,7 +78,7 @@ are shown below as well as the output from all 3 statistical programs
     [p,fh,stats]=MatSurv(laml_RC_TimeVar, laml_RC_EventVar,  laml_RC_GroupVar,...
     'GroupsToUse', {'Good','Intermediate','Poor'},'Xstep',24);
 
-![](figure_09272018.png)
+![](figure_20181022.png)
 
 The results from the MatSurv have been compared against both SAS and R
 and found to return similar estimates. The Chi-Sq value and p-values
