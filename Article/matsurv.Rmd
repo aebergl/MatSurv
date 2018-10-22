@@ -42,7 +42,7 @@ LAML | HGF Median | 6.63 | 0.01 | 6.63 | 0.01 | 6.6 | 0.01 |
 LAML | HGF Quartiles | 13.01 | 3.09E-4 | 13.01 | 3.09E-4 |  13.0 | 30.9E-4 |
 LAML | HGF [6,12] | 16.78 | 2.27 E-4 | 16.78 | 2.27E-4 | 16.8 | 2.27E-4 | 
 
-![](matSurv_comp.png)
+![](figure_20181022.png)
 
 
 # Acknowledgements
