@@ -44,6 +44,7 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 %          HR_95_CI_MH_Inv: Inverted 95% Confidence intervals [lower upper]
 %       MedianSurvivalTime: Median survival time for each group
 %
+%
 % OTHER PARAMETERS (passed as parameter-value pairs)
 % * 'NoPlot': A true/false value which, if true, no figure is created
 %   (default: false)
