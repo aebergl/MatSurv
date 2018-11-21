@@ -14,9 +14,9 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 %
 % * 'EventVar' is a vector or cell array defining events or censored
 %   observation. Events are defined with a 1 and censored point with a 0. By
-%   default 'Dead', 'Deceased', 'Relapsed', 'Yes', 'Event' 'Progression' & 
+%   default 'Dead', 'Deceased', 'Relapsed', 'Yes', 'Event' 'Progression' &
 %   'Progressed' are considered as events.
-%   'Alive', 'Living', 'Not Relapsed', 'DiseaseFree', 'No' 'NoEvent' 
+%   'Alive', 'Living', 'Not Relapsed', 'DiseaseFree', 'No' 'NoEvent'
 %   'Censored' 'NoProgression' are considers as censored
 %   'EventDefinition' can be used to define other types of events
 %
@@ -27,6 +27,22 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 % * p       : log rank p-value
 % * fh      : figure handle to KM-plot figure
 % * stats   : Additional statistics from the log rank test
+%
+% stats = 
+%   struct with fields:
+% 
+%               GroupNames: Cell with group names
+%                     p_MC: log rank p-value (Mantel-Cox)
+%                  Chi2_MC: Chi square (Mantel-Cox)
+%               HR_logrank: Hazard Ratio (log rank)
+%         HR_95_CI_logrank: 95% Confidence intervals [lower upper]
+%           HR_logrank_Inv: Inverted Hazard Ratio (log rank)
+%     HR_95_CI_logrank_Inv: Inverted 95% Confidence intervals [lower upper]
+%                    HR_MH: Hazard Ratio (Mantel-Haenszel)
+%              HR_95_CI_MH: 95% Confidence intervals [lower upper]
+%                HR_MH_Inv: Inverted Hazard Ratio (Mantel-Haenszel)
+%          HR_95_CI_MH_Inv: Inverted 95% Confidence intervals [lower upper]
+%       MedianSurvivalTime: Median survival time for each group
 %
 % OTHER PARAMETERS (passed as parameter-value pairs)
 % * 'NoPlot': A true/false value which, if true, no figure is created
@@ -101,6 +117,9 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 %
 % * 'DispHR': A true/false value which, if true, Hazard ration (HR)
 %   is displayed on the KM-plot. (default: true)
+%
+% * 'Use_HR_MH': A true/false value which, if true, Mantel-Haenszel HR
+%   is displayed instead of the logrank HR. (default: true)
 %
 % * 'InvHR': A true/false value which, if true, the inverted HR value
 %   is displayed on the KM-plot. (default: false)
@@ -271,7 +290,7 @@ if options.PairWiseP
     end
 end
 
-% Calculate median survival time if no plot is created 
+% Calculate median survival time if no plot is created
 if options.NoPlot
     stats.MedianSurvivalTime=ones(DATA.numGroups,1) * NaN;
     for i=1:DATA.numGroups
@@ -414,10 +433,19 @@ else % Creat KM-Plot
     if options.DispP
         txt_str(1) = {sprintf('p = %.3g',p)};
         if options.DispHR
-            if options.InvHR
-                txt_str(2) = {sprintf('HR = %.3g (%.3g - %.3g)',stats.HR_logrank_Inv, stats.HR_95_CI_logrank_Inv(1), stats.HR_95_CI_logrank_Inv(2))};
+            if ~options.Use_HR_MH
+                if options.InvHR
+                    txt_str(2) = {sprintf('HR = %.3g (%.3g - %.3g)',stats.HR_logrank_Inv, stats.HR_95_CI_logrank_Inv(1), stats.HR_95_CI_logrank_Inv(2))};
+                else
+                    txt_str(2) = {sprintf('HR = %.3g (%.3g - %.3g)',stats.HR_logrank, stats.HR_95_CI_logrank(1), stats.HR_95_CI_logrank(2))};
+                end
+                
             else
-                txt_str(2) = {sprintf('HR = %.3g (%.3g - %.3g)',stats.HR_logrank, stats.HR_95_CI_logrank(1), stats.HR_95_CI_logrank(2))};
+                if options.InvHR
+                    txt_str(2) = {sprintf('HR = %.3g (%.3g - %.3g)',stats.HR_MH_Inv, stats.HR_95_CI_MH_Inv(1), stats.HR_95_CI_MH_Inv(2))};
+                else
+                    txt_str(2) = {sprintf('HR = %.3g (%.3g - %.3g)',stats.HR_MH, stats.HR_95_CI_MH(1), stats.HR_95_CI_MH(2))};
+                end
             end
         end
         text(axh_KM,Nudge_X,0.1,txt_str,'FontSize',options.BaseFontSize + options.PvalFontSize,'tag','p-value')
@@ -455,13 +483,18 @@ else % Creat KM-Plot
                     'FontSize',options.BaseFontSize + options.RT_FontSize,'Color',cMAP_RT(j,:))
             end
         end
+        % Create Line
+        %Get position for all text objects
+        txt_pos = [axh_RT.Children(2:end).Extent];
+        %get the second element for all text objects
+        left_pos = min(txt_pos(1:4:end));
+        nudge_x = abs(axh_RT.XLim(2) - axh_RT.XLim(1))/100;
+        
+        line(axh_RT,[left_pos-nudge_x left_pos-nudge_x],[axh_RT.YTick(1)-0.5 axh_RT.YTick(end)+0.5],'color','k','clipping','off','LineWidth',1.25)
+        
         
         %Set Y label for risk table
         if options.RT_YLabel
-            left_pos = axh_RT.Children(end).Extent(1); % Get left most position for text
-            nudge_x = abs(axh_RT.XLim(2) - axh_RT.XLim(1))/100;
-            
-            line(axh_RT,[left_pos-nudge_x left_pos-nudge_x],[axh_RT.YTick(1)-0.5 axh_RT.YTick(end)+0.5],'color','k','clipping','off','LineWidth',1.25)
             for j = 1:DATA.numGroups
                 text(axh_RT,left_pos-(nudge_x*2),axh_RT.YTick(end-j+1),DATA.GROUPS(j).GroupName,...
                     'HorizontalAlignment','right','VerticalAlignment','middle',...
@@ -532,6 +565,7 @@ p.addParameter('BaseFontSize',16);
 % KM plot options
 p.addParameter('DispP',1);
 p.addParameter('DispHR',1);
+p.addParameter('Use_HR_MH',0);
 p.addParameter('DrawMSL',0);
 p.addParameter('InvHR',0);
 p.addParameter('Xstep',[], @(x)isnumeric(x) && isscalar(x));
@@ -668,7 +702,7 @@ if DATA.numGroups == 2
     stats.HR_95_CI_MH = [exp(L - 1.96/sqrt(Var_OE_sum)), exp(L + 1.96/sqrt(Var_OE_sum))];
     stats.HR_MH_Inv  = 1 / stats.HR_MH;
     stats.HR_95_CI_MH_Inv = flip(1 ./ stats.HR_95_CI_MH);
-   
+    
 end
 
 
@@ -703,7 +737,7 @@ nf(2:end) = nf(2:end) - mf_cumsum(1:end-1);
 % Find censored points
 indx_censor = (EventVar == 0);
 tfq = unique(TimeVar(indx_censor));
-mfq = sum(repmat(TimeVar(indx_censor),1,length(tfq)) == repmat(tfq',length(TimeVar(indx_censor)),1),1)'; 
+mfq = sum(repmat(TimeVar(indx_censor),1,length(tfq)) == repmat(tfq',length(TimeVar(indx_censor)),1),1)';
 
 % Find time points where there are censored data
 [~,tf_indx,~]=intersect(tf,tfq,'stable');
@@ -807,7 +841,7 @@ elseif strcmpi('Quartile',options.CutPoint)  && isnumeric(GroupVar)
     DATA.GROUPS(2).GroupName = {sprintf('x < %g',Cut_Val(1))};
     DATA.GROUPS(2).TimeVar = TimeVar(indx_Below);
     DATA.GROUPS(2).EventVar = EventVarBin(indx_Below);
-
+    
 elseif strcmpi('Tertile',options.CutPoint)  && isnumeric(GroupVar)
     Cut_Val = prctile(GroupVar,[100/3 100/1.5]);
     DATA.GroupType = 'Tertile';
@@ -888,12 +922,12 @@ elseif iscell(EventVar)
         end
     else % Set values based on common event types such as dead/alive
         indx_Event = strcmpi('Dead',EventVar) | strcmpi('Deceased',EventVar) | strcmpi('Relapsed',EventVar)...
-                    |  strcmpi('Yes',EventVar) | strcmpi('Event',EventVar) | strcmpi('Progression',EventVar)...
-                    | strcmpi('Progressed',EventVar);
+            |  strcmpi('Yes',EventVar) | strcmpi('Event',EventVar) | strcmpi('Progression',EventVar)...
+            | strcmpi('Progressed',EventVar);
         
         indx_NoEvent = strcmpi('Alive',EventVar) | strcmpi('Living',EventVar) | strcmpi('NotRelapsed',EventVar)...
-                    | strcmpi('DiseaseFree',EventVar) | strcmpi('No',EventVar) | strcmpi('Censored',EventVar)...
-                    | strcmpi('NoProgression',EventVar) | strcmpi('NoEvent',EventVar);
+            | strcmpi('DiseaseFree',EventVar) | strcmpi('No',EventVar) | strcmpi('Censored',EventVar)...
+            | strcmpi('NoProgression',EventVar) | strcmpi('NoEvent',EventVar);
         
         if sum(indx_Event) + sum(indx_NoEvent) == length(EventVar)
             EventVarBin(indx_Event) = 1;
