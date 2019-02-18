@@ -1,3 +1,5 @@
+% Modification of Anders Berglund's excellent MatSurv function to accept
+% more than two groups. Also implemented custom ordering of groups.
 function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 % USAGE:
 %   MatSurv(TimeVar, EventVar, GroupVar,'param', value, ...) creates a Kaplan-Meier plot,
@@ -28,9 +30,9 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 % * fh      : figure handle to KM-plot figure
 % * stats   : Additional statistics from the log rank test
 %
-% stats = 
+% stats =
 %   struct with fields:
-% 
+%
 %               GroupNames: Cell with group names
 %                     p_MC: log rank p-value (Mantel-Cox)
 %                  Chi2_MC: Chi square (Mantel-Cox)
@@ -270,6 +272,11 @@ if options.FlipGroupOrder
     DATA.GROUPS = DATA.GROUPS(DATA.numGroups:-1:1);
 end
 
+if options.GroupOrder
+    DATA.GROUPS = DATA.GROUPS(options.GroupOrder);
+end
+
+
 % Creat Survival table for plotting
 [DATA] = MatSurvCreateTable(DATA);
 
@@ -436,20 +443,28 @@ else % Creat KM-Plot
         if options.DispHR
             if ~options.Use_HR_MH
                 if options.InvHR
-                    txt_str(2) = {sprintf('HR = %.3g (%.3g - %.3g)',stats.HR_logrank_Inv, stats.HR_95_CI_logrank_Inv(1), stats.HR_95_CI_logrank_Inv(2))};
+                    for(k = 1:length(stats.HR_logrank_Inv))
+                        txt_str(k+1) = {sprintf('HR %s/%s = %.3g (%.3g - %.3g)',DATA.GROUPS(k).GroupName{1}(1),DATA.GROUPS(k+1).GroupName{1}(1), stats.HR_logrank_Inv(k), stats.HR_95_CI_logrank_Inv(k,1), stats.HR_95_CI_logrank_Inv(k,2))};
+                    end
                 else
-                    txt_str(2) = {sprintf('HR = %.3g (%.3g - %.3g)',stats.HR_logrank, stats.HR_95_CI_logrank(1), stats.HR_95_CI_logrank(2))};
+                    for(k = 1:length(stats.HR_logrank))
+                        txt_str(k+1) = {sprintf('HR = %.3g (%.3g - %.3g)',stats.HR_logrank(k), stats.HR_95_CI_logrank(k,1), stats.HR_95_CI_logrank(k,2))};
+                    end
                 end
                 
             else
                 if options.InvHR
-                    txt_str(2) = {sprintf('HR = %.3g (%.3g - %.3g)',stats.HR_MH_Inv, stats.HR_95_CI_MH_Inv(1), stats.HR_95_CI_MH_Inv(2))};
+                    for(k = 1:length(stats.HR_logrank_Inv))
+                        txt_str(k+1) = {sprintf('HR %s/%s = %.3g (%.3g - %.3g)',DATA.GROUPS(k).GroupName{1}(1),DATA.GROUPS(k+1).GroupName{1}(1), stats.HR_MH_Inv(k), stats.HR_95_CI_MH_Inv(k,1), stats.HR_95_CI_MH_Inv(k,2))};
+                    end
                 else
-                    txt_str(2) = {sprintf('HR = %.3g (%.3g - %.3g)',stats.HR_MH, stats.HR_95_CI_MH(1), stats.HR_95_CI_MH(2))};
+                    for(k = 1:length(stats.HR_logrank_Inv))
+                        txt_str(k+1) = {sprintf('HR %s/%s = %.3g (%.3g - %.3g)',DATA.GROUPS(k).GroupName{1}(1),DATA.GROUPS(k+1).GroupName{1}(1), stats.HR_MH(k), stats.HR_95_CI_MH(k,1), stats.HR_95_CI_MH(k,2))};
+                    end
                 end
             end
         end
-        text(axh_KM,Nudge_X,0.1,txt_str,'FontSize',options.BaseFontSize + options.PvalFontSize,'tag','p-value')
+        text(axh_KM,Nudge_X,0.15,txt_str,'FontSize',options.BaseFontSize + options.PvalFontSize,'tag','p-value')
     end
     
     % And now to the Risk table
@@ -514,10 +529,12 @@ if options.Print
     fprintf('\n')
     fprintf('p = %.3g\n',stats.p_MC)
     if options.CalcHR
-        if options.InvHR
-            fprintf('HR = %.3g (%.3g - %.3g)\n',stats.HR_logrank_Inv, stats.HR_95_CI_logrank_Inv(1), stats.HR_95_CI_logrank_Inv(2));
-        else
-            fprintf('HR = %.3g (%.3g - %.3g)\n',stats.HR_logrank, stats.HR_95_CI_logrank(1), stats.HR_95_CI_logrank(2));
+        for(k = 1:length(stats.HR_logrank))
+            if options.InvHR
+                fprintf('HR = %.3g (%.3g - %.3g)\n',stats.HR_logrank_Inv(k), stats.HR_95_CI_logrank_Inv(1), stats.HR_95_CI_logrank_Inv(2));
+            else
+                fprintf('HR = %.3g (%.3g - %.3g)\n',stats.HR_logrank(k), stats.HR_95_CI_logrank(1), stats.HR_95_CI_logrank(2));
+            end
         end
     end
     for i = 1: DATA.numGroups
@@ -703,7 +720,21 @@ if DATA.numGroups == 2
     stats.HR_95_CI_MH = [exp(L - 1.96/sqrt(Var_OE_sum)), exp(L + 1.96/sqrt(Var_OE_sum))];
     stats.HR_MH_Inv  = 1 / stats.HR_MH;
     stats.HR_95_CI_MH_Inv = flip(1 ./ stats.HR_95_CI_MH);
-    
+else
+    for(c = 1:DATA.numGroups-1)
+        %         for(d = (c+1):DATA.numGroups)
+        d = c + 1;
+        stats.HR_logrank(c) = (sum(mf(:,c)) / sum(ef(:,c))) / (sum(mf(:,d)) / sum(ef(:,d)));
+        stats.HR_95_CI_logrank(c,1:2) = [exp((log(stats.HR_logrank(c)) - 1.96 * sqrt(1/sum(ef(:,c)) + 1/sum(ef(:,d))))), exp((log(stats.HR_logrank(c)) + 1.96 * sqrt(1/sum(ef(:,c)) + 1/sum(ef(:,d)))))];
+        stats.HR_logrank_Inv(c) = 1/stats.HR_logrank(c);
+        stats.HR_95_CI_logrank_Inv(c,1:2) = flip(1 ./ stats.HR_95_CI_logrank(c,1:2));
+        %             L = (sum(mf(:,c)) - sum(ef(:,c))) / Var_OE_sum;
+        %             stats.HR_MH(c)  = exp(L);
+        %             stats.HR_95_CI_MH(c) = [exp(L - 1.96/sqrt(Var_OE_sum)), exp(L + 1.96/sqrt(Var_OE_sum))];
+        %             stats.HR_MH_Inv(c)  = 1 / stats.HR_MH(c);
+        %             stats.HR_95_CI_MH_Inv(c) = flip(1 ./ stats.HR_95_CI_MH(c));
+        %         end
+    end
 end
 
 
@@ -889,10 +920,10 @@ elseif (isvector(options.CutPoint)) && isnumeric(GroupVar)
 end
 
 % Hazard ration can only be calculated if there is two groups
-if DATA.numGroups ~= 2
-    options.DispHR = 0;
-    options.CalcHR = 0;
-end
+% if DATA.numGroups ~= 2
+%     options.DispHR = 0;
+%     options.CalcHR = 0;
+% end
 
 end
 
@@ -968,14 +999,14 @@ elseif iscell(EventVar)
     rem_indx_event = (cellfun('isempty',EventVar) | strcmpi('[Not Available]',EventVar) | strcmpi('NA',EventVar));
 end
 % Check Group variable for missing data and/or empty cells and cells with NA
-if isnumeric(GroupVar)
+if isnumeric(GroupVar) || islogical(GroupVar)
     rem_indx_group = isnan(GroupVar);
 elseif iscell(GroupVar)
     rem_indx_group = (cellfun('isempty',GroupVar) | strcmpi('NA',GroupVar));
 end
 
 % Merge all indexes and remove entries
-rem_indx = (rem_indx_time | rem_indx_event |rem_indx_group);
+rem_indx = (rem_indx_time | rem_indx_event | rem_indx_group);
 if sum(rem_indx) > 0
     TimeVar(rem_indx) = [];
     EventVar(rem_indx) = [];
