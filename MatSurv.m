@@ -1,5 +1,7 @@
 % Modification of Anders Berglund's excellent MatSurv function to accept
-% more than two groups. Also implemented custom ordering of groups.
+% more than two groups. Also implemented custom ordering of groups. Added
+% option for legend to be off (default: on);
+% -Patrick Leo, CCIPD
 function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 % USAGE:
 %   MatSurv(TimeVar, EventVar, GroupVar,'param', value, ...) creates a Kaplan-Meier plot,
@@ -50,7 +52,7 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 % OTHER PARAMETERS (passed as parameter-value pairs)
 % * 'NoPlot': A true/false value which, if true, no figure is created
 %   (default: false)
-%
+% 
 % * 'NoRiskTable': A true/false value which, if true, no risk table is
 %   included in the KM-plot. (default: false)
 %
@@ -91,6 +93,8 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 %
 %
 % KM plot options
+%
+%   'legend': Whether to show group legend. Default: true
 %
 % * 'LineColor': Either a matrix of size numLevels-by-3 representing the
 %   colormap to be used or a string for a MATLAB colormap (lines, parula,
@@ -211,6 +215,11 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 % * 'RT_YLabel': True/False for displaying the group names on the Risk table
 %   Y-axis (Default: True )
 %
+% * 'CensorInRT': True/False for whether number censored should be listed
+% in risk table (Default: False)
+%
+% * 'RTtitleAlignment': Where RT title should be algined (Default: middle)
+%
 %   EXAMPLES:
 %   [p,fh,stats] = MatSurv([], [], [],'Xstep',4,'Title','MatSurv KM-Plot','FlipColor',1,'XMinorTick',3);
 %
@@ -307,6 +316,10 @@ if options.NoPlot
         indx_MST = find((yb <= 0.5),1);
         if ~isempty(indx_MST)
             stats.MedianSurvivalTime(i) = xb(indx_MST);
+%         else
+%             % revert to other median
+%             [~,indx_MST] = min(yb-median(yb));
+%             stats.MedianSurvivalTime(i) = xb(indx_MST);
         end
     end
     fh = [];
@@ -414,10 +427,12 @@ else % Creat KM-Plot
     end
     
     % Set legend
-    h_LE=legend(S,[DATA.GROUPS(:).GroupName]);
-    h_LE.Box='off';
-    title(h_LE,DATA.GroupType);
-    h_LE.FontSize=options.BaseFontSize + options.LegendFontSize;
+    if options.legend
+        h_LE=legend(S,[DATA.GROUPS(:).GroupName]);
+        h_LE.Box='off';
+        title(h_LE,DATA.GroupType);
+        h_LE.FontSize=options.BaseFontSize + options.LegendFontSize;
+    end
     
     % Get Xticks
     if ~isempty(options.XLim)
@@ -439,27 +454,31 @@ else % Creat KM-Plot
     axh_KM.LineWidth = 1.5;
     
     if options.DispP
-        txt_str(1) = {sprintf('p = %.3g',p)};
+        txt_str(1) = {sprintf('p = %.2g',p)};
         if options.DispHR
             if ~options.Use_HR_MH
                 if options.InvHR
+                    if(length(stats.HR_logrank_Inv) > 2)
                     for(k = 1:length(stats.HR_logrank_Inv))
-                        txt_str(k+1) = {sprintf('HR %s/%s = %.3g (%.3g - %.3g)',DATA.GROUPS(k).GroupName{1}(1),DATA.GROUPS(k+1).GroupName{1}(1), stats.HR_logrank_Inv(k), stats.HR_95_CI_logrank_Inv(k,1), stats.HR_95_CI_logrank_Inv(k,2))};
+                        txt_str(k+1) = {sprintf('HR %s/%s = %.2f (%.2f - %.2f)',DATA.GROUPS(k).GroupName{1}(1),DATA.GROUPS(k+1).GroupName{1}(1), stats.HR_logrank_Inv(k), stats.HR_95_CI_logrank_Inv(k,1), stats.HR_95_CI_logrank_Inv(k,2))};
+                    end
+                    else
+                        txt_str(2) = {sprintf('HR = %.2f (%.2f - %.2f)',stats.HR_logrank_Inv, stats.HR_95_CI_logrank_Inv(1), stats.HR_95_CI_logrank_Inv(2))};
                     end
                 else
                     for(k = 1:length(stats.HR_logrank))
-                        txt_str(k+1) = {sprintf('HR = %.3g (%.3g - %.3g)',stats.HR_logrank(k), stats.HR_95_CI_logrank(k,1), stats.HR_95_CI_logrank(k,2))};
+                        txt_str(k+1) = {sprintf('HR = %.2f (%.2f - %.2f)',stats.HR_logrank(k), stats.HR_95_CI_logrank(k,1), stats.HR_95_CI_logrank(k,2))};
                     end
                 end
                 
             else
                 if options.InvHR
                     for(k = 1:length(stats.HR_logrank_Inv))
-                        txt_str(k+1) = {sprintf('HR %s/%s = %.3g (%.3g - %.3g)',DATA.GROUPS(k).GroupName{1}(1),DATA.GROUPS(k+1).GroupName{1}(1), stats.HR_MH_Inv(k), stats.HR_95_CI_MH_Inv(k,1), stats.HR_95_CI_MH_Inv(k,2))};
+                        txt_str(k+1) = {sprintf('HR %s/%s = %.2f (%.2f - %.2f)',DATA.GROUPS(k).GroupName{1}(1),DATA.GROUPS(k+1).GroupName{1}(1), stats.HR_MH_Inv(k), stats.HR_95_CI_MH_Inv(k,1), stats.HR_95_CI_MH_Inv(k,2))};
                     end
                 else
                     for(k = 1:length(stats.HR_logrank_Inv))
-                        txt_str(k+1) = {sprintf('HR %s/%s = %.3g (%.3g - %.3g)',DATA.GROUPS(k).GroupName{1}(1),DATA.GROUPS(k+1).GroupName{1}(1), stats.HR_MH(k), stats.HR_95_CI_MH(k,1), stats.HR_95_CI_MH(k,2))};
+                        txt_str(k+1) = {sprintf('HR %s/%s = %.2f (%.2f - %.2f)',DATA.GROUPS(k).GroupName{1}(1),DATA.GROUPS(k+1).GroupName{1}(1), stats.HR_MH(k), stats.HR_95_CI_MH(k,1), stats.HR_95_CI_MH(k,2))};
                     end
                 end
             end
@@ -472,14 +491,21 @@ else % Creat KM-Plot
         axh_RT.XTick=axh_KM.XTick;
         % Get number of samples for each time point
         RT_X = zeros(length(axh_KM.XTick),DATA.numGroups);
+        RT_Xcensor = zeros(length(axh_KM.XTick),DATA.numGroups);
         for i = 1:length(axh_KM.XTick)
             for j = 1:DATA.numGroups
                 %RT_X(i,j) = sum(DATA.GROUPS(j).TimeVar > axh_KM.XTick(i) & DATA.GROUPS(j).EventVar == 1) + sum(DATA.GROUPS(j).TimeVar >= axh_KM.XTick(i) & DATA.GROUPS(j).EventVar == 0);
-                RT_X(i,j) = sum(DATA.GROUPS(j).TimeVar >= axh_KM.XTick(i));
+                if(options.CensorInRT)
+                    RT_X(i,j) = sum(DATA.GROUPS(j).TimeVar >= axh_KM.XTick(i));
+                    RT_Xcensor(i,j) = sum(DATA.GROUPS(j).TimeVar < axh_KM.XTick(i) & DATA.GROUPS(j).EventVar == 0);
+                else
+                    RT_X(i,j) = sum(DATA.GROUPS(j).TimeVar >= axh_KM.XTick(i));
+                end
             end
             
         end
-        axh_RT.YLim = [0.5 DATA.numGroups + 0.5];
+%         axh_RT.YLim = [0.5 DATA.numGroups + 0.5];
+axh_RT.YLim = [0 DATA.numGroups + 0.5];
         axh_RT.YTick = 1:DATA.numGroups;
         linkaxes([axh_RT,axh_KM],'x')
         
@@ -494,9 +520,15 @@ else % Creat KM-Plot
         for i = 1:length(axh_KM.XTick)
             for j = 1:DATA.numGroups
                 %sprintf('%u',RT_X(i,j))
-                text(axh_RT,axh_RT.XTick(i),axh_RT.YTick(end-j+1),sprintf('%u',RT_X(i,j)),...
-                    'HorizontalAlignment','center','VerticalAlignment','middle',...
+                if(options.CensorInRT)
+                    text(axh_RT,axh_RT.XTick(i),axh_RT.YTick(end-j+1),sprintf('%u (%u)',RT_X(i,j),RT_Xcensor(i,j)),...
+                    'HorizontalAlignment',options.RTtitleAlignment,'VerticalAlignment','middle',...
                     'FontSize',options.BaseFontSize + options.RT_FontSize,'Color',cMAP_RT(j,:))
+                else
+                text(axh_RT,axh_RT.XTick(i),axh_RT.YTick(end-j+1),sprintf('%u',RT_X(i,j)),...
+                    'HorizontalAlignment',options.RTtitleAlignment,'VerticalAlignment','middle',...
+                    'FontSize',options.BaseFontSize + options.RT_FontSize,'Color',cMAP_RT(j,:))
+                end
             end
         end
         % Create Line
@@ -527,13 +559,13 @@ end
 
 if options.Print
     fprintf('\n')
-    fprintf('p = %.3g\n',stats.p_MC)
+    fprintf('p = %.2f\n',stats.p_MC)
     if options.CalcHR
         for(k = 1:length(stats.HR_logrank))
             if options.InvHR
-                fprintf('HR = %.3g (%.3g - %.3g)\n',stats.HR_logrank_Inv(k), stats.HR_95_CI_logrank_Inv(1), stats.HR_95_CI_logrank_Inv(2));
+                fprintf('HR = %.2f (%.2f - %.2f)\n',stats.HR_logrank_Inv(k), stats.HR_95_CI_logrank_Inv(1), stats.HR_95_CI_logrank_Inv(2));
             else
-                fprintf('HR = %.3g (%.3g - %.3g)\n',stats.HR_logrank(k), stats.HR_95_CI_logrank(1), stats.HR_95_CI_logrank(2));
+                fprintf('HR = %.2f (%.2f - %.2f)\n',stats.HR_logrank(k), stats.HR_95_CI_logrank(1), stats.HR_95_CI_logrank(2));
             end
         end
     end
@@ -558,6 +590,9 @@ end
 function params = MatSurvParseInput(varargin)
 %Parse input and set defualt values
 p = inputParser;
+
+p.addParameter('legend',true);
+
 p.addParameter('NoPlot',false);
 p.addParameter('NoRiskTable',false);
 p.addParameter('CutPoint','Median');
@@ -621,6 +656,8 @@ p.addParameter('RT_Color','same');
 p.addParameter('RT_YLabel',1);
 p.addParameter('RT_Title',[]);
 p.addParameter('RT_TitleOptions',cell(0,0));
+p.addParameter('CensorInRT',false);
+p.addParameter('RTtitleAlignment','center')
 
 %Others
 p.addParameter('CalcHR',1);
