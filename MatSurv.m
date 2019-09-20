@@ -6,7 +6,7 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 %   [p] = MatSurv( ... ) returns the log rank p-value
 %   [p, fh] = MatSurv( ... ) returns both p-value and figure handle
 %   [p, fh, stats] = MatSurv( ... ) returns additions stats from log rank test
-%   [p, fh, stats] = MatSurv([], [], [], ... ) loads test dataset
+%   [p, fh, stats] = MatSurv([], [], []) loads test dataset
 %
 % INPUTS:
 % * 'TimeVar' is a vector with numeric time to event, either observed or
@@ -90,7 +90,7 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 %
 % KM plot options
 %
-%   'legend': Whether to show group legend. Default: true
+% * 'legend': Whether to show group legend. Default: true
 %
 % * 'LineColor': Either a matrix of size numLevels-by-3 representing the
 %   colormap to be used or a string for a MATLAB colormap (lines, parula,
@@ -240,7 +240,7 @@ end
 % Load test data
 if isempty(TimeVar) && isempty(EventVar) && isempty(GroupVar)
     [TimeVar, EventVar, GroupVar] = MatSurvLoadTestData;
-    varargin =[varargin,{'TimeUnit','Weeks'}];
+    varargin =[varargin,{'TimeUnit','Weeks'},{'Title',{'Test example taken from:';'Freireich, EJ et al. 1963, Blood, 21, 699-716)'}}];
 end
 
 % Check that they are all vectors
@@ -454,38 +454,26 @@ else % Creat KM-Plot
     axh_KM.LineWidth = 1.5;
     
     if options.DispP
-        txt_str(1) = {sprintf('p = %.2g',p)};
+        txt_str(1) = {sprintf('p = %.3g',p)};
         if options.DispHR
             if ~options.Use_HR_MH
                 if options.InvHR
-                    if(length(stats.HR_logrank_Inv) > 2)
-                    for(k = 1:length(stats.HR_logrank_Inv))
-                        txt_str(k+1) = {sprintf('HR %s/%s = %.2f (%.2f - %.2f)',DATA.GROUPS(k).GroupName{1}(1),DATA.GROUPS(k+1).GroupName{1}(1), stats.HR_logrank_Inv(k), stats.HR_95_CI_logrank_Inv(k,1), stats.HR_95_CI_logrank_Inv(k,2))};
-                    end
-                    else
-                        txt_str(2) = {sprintf('HR = %.2f (%.2f - %.2f)',stats.HR_logrank_Inv, stats.HR_95_CI_logrank_Inv(1), stats.HR_95_CI_logrank_Inv(2))};
-                    end
+                    txt_str(2) = {sprintf('HR = %.3g (%.3g - %.3g)',stats.HR_logrank_Inv, stats.HR_95_CI_logrank_Inv(1), stats.HR_95_CI_logrank_Inv(2))};
                 else
-                    for(k = 1:length(stats.HR_logrank))
-                        txt_str(k+1) = {sprintf('HR = %.2f (%.2f - %.2f)',stats.HR_logrank(k), stats.HR_95_CI_logrank(k,1), stats.HR_95_CI_logrank(k,2))};
-                    end
+                    txt_str(2) = {sprintf('HR = %.3g (%.3g - %.3g)',stats.HR_logrank, stats.HR_95_CI_logrank(1), stats.HR_95_CI_logrank(2))};
                 end
                 
             else
                 if options.InvHR
-                    for(k = 1:length(stats.HR_logrank_Inv))
-                        txt_str(k+1) = {sprintf('HR %s/%s = %.2f (%.2f - %.2f)',DATA.GROUPS(k).GroupName{1}(1),DATA.GROUPS(k+1).GroupName{1}(1), stats.HR_MH_Inv(k), stats.HR_95_CI_MH_Inv(k,1), stats.HR_95_CI_MH_Inv(k,2))};
-                    end
+                    txt_str(2) = {sprintf('HR = %.3g (%.3g - %.3g)',stats.HR_MH_Inv, stats.HR_95_CI_MH_Inv(1), stats.HR_95_CI_MH_Inv(2))};
                 else
-                    for(k = 1:length(stats.HR_logrank_Inv))
-                        txt_str(k+1) = {sprintf('HR %s/%s = %.2f (%.2f - %.2f)',DATA.GROUPS(k).GroupName{1}(1),DATA.GROUPS(k+1).GroupName{1}(1), stats.HR_MH(k), stats.HR_95_CI_MH(k,1), stats.HR_95_CI_MH(k,2))};
-                    end
+                    txt_str(2) = {sprintf('HR = %.3g (%.3g - %.3g)',stats.HR_MH, stats.HR_95_CI_MH(1), stats.HR_95_CI_MH(2))};
                 end
             end
         end
-        text(axh_KM,Nudge_X,0.15,txt_str,'FontSize',options.BaseFontSize + options.PvalFontSize,'tag','p-value')
+        text(axh_KM,Nudge_X,0.1,txt_str,'FontSize',options.BaseFontSize + options.PvalFontSize,'tag','p-value')
     end
-    
+   
     % And now to the Risk table
     if ~options.NoRiskTable
         axh_RT.XTick=axh_KM.XTick;
@@ -505,7 +493,7 @@ else % Creat KM-Plot
             
         end
 %         axh_RT.YLim = [0.5 DATA.numGroups + 0.5];
-axh_RT.YLim = [0 DATA.numGroups + 0.5];
+        axh_RT.YLim = [0 DATA.numGroups + 0.5];
         axh_RT.YTick = 1:DATA.numGroups;
         linkaxes([axh_RT,axh_KM],'x')
         
@@ -561,7 +549,7 @@ if options.Print
     fprintf('\n')
     fprintf('p = %.2f\n',stats.p_MC)
     if options.CalcHR
-        for(k = 1:length(stats.HR_logrank))
+        for k = 1:length(stats.HR_logrank)
             if options.InvHR
                 fprintf('HR = %.2f (%.2f - %.2f)\n',stats.HR_logrank_Inv(k), stats.HR_95_CI_logrank_Inv(1), stats.HR_95_CI_logrank_Inv(2));
             else
@@ -757,21 +745,6 @@ if DATA.numGroups == 2
     stats.HR_95_CI_MH = [exp(L - 1.96/sqrt(Var_OE_sum)), exp(L + 1.96/sqrt(Var_OE_sum))];
     stats.HR_MH_Inv  = 1 / stats.HR_MH;
     stats.HR_95_CI_MH_Inv = flip(1 ./ stats.HR_95_CI_MH);
-else
-    for(c = 1:DATA.numGroups-1)
-        %         for(d = (c+1):DATA.numGroups)
-        d = c + 1;
-        stats.HR_logrank(c) = (sum(mf(:,c)) / sum(ef(:,c))) / (sum(mf(:,d)) / sum(ef(:,d)));
-        stats.HR_95_CI_logrank(c,1:2) = [exp((log(stats.HR_logrank(c)) - 1.96 * sqrt(1/sum(ef(:,c)) + 1/sum(ef(:,d))))), exp((log(stats.HR_logrank(c)) + 1.96 * sqrt(1/sum(ef(:,c)) + 1/sum(ef(:,d)))))];
-        stats.HR_logrank_Inv(c) = 1/stats.HR_logrank(c);
-        stats.HR_95_CI_logrank_Inv(c,1:2) = flip(1 ./ stats.HR_95_CI_logrank(c,1:2));
-        %             L = (sum(mf(:,c)) - sum(ef(:,c))) / Var_OE_sum;
-        %             stats.HR_MH(c)  = exp(L);
-        %             stats.HR_95_CI_MH(c) = [exp(L - 1.96/sqrt(Var_OE_sum)), exp(L + 1.96/sqrt(Var_OE_sum))];
-        %             stats.HR_MH_Inv(c)  = 1 / stats.HR_MH(c);
-        %             stats.HR_95_CI_MH_Inv(c) = flip(1 ./ stats.HR_95_CI_MH(c));
-        %         end
-    end
 end
 
 
@@ -892,9 +865,7 @@ elseif (strcmpi('Median',options.CutPoint) || isscalar(options.CutPoint)) && isn
     end
     
     DATA.GROUPS(1).TimeVar = TimeVar(indx_Above);
-    DATA.GROUPS(1).EventVar = EventVarBin(indx_Above);
-    
-    
+    DATA.GROUPS(1).EventVar = EventVarBin(indx_Above);    
     DATA.GROUPS(2).TimeVar = TimeVar(indx_Below);
     DATA.GROUPS(2).EventVar = EventVarBin(indx_Below);
     
@@ -956,11 +927,11 @@ elseif (isvector(options.CutPoint)) && isnumeric(GroupVar)
     DATA.GROUPS(i+1).EventVar = EventVarBin(indx);
 end
 
-% Hazard ration can only be calculated if there is two groups
-% if DATA.numGroups ~= 2
-%     options.DispHR = 0;
-%     options.CalcHR = 0;
-% end
+%Hazard ration can only be calculated if there is two groups
+if DATA.numGroups ~= 2
+    options.DispHR = 0;
+    options.CalcHR = 0;
+end
 
 end
 
@@ -974,6 +945,11 @@ function [EventVarBin] = MatSurvDefineEventVar(EventVar, options)
 
 % Set all entries to zeros
 EventVarBin = zeros(size(EventVar));
+
+% Check if its a string array and convert to cell array
+if isstring(EventVar)
+    EventVar = cellstr(EventVar);    
+end
 
 if islogical(EventVar) % Set TRUE to 1
     EventVarBin(EventVar) = 1;
@@ -1012,7 +988,7 @@ end
 end
 
 function [TimeVar, EventVar, GroupVar] = MatSurvCleanData(TimeVar, EventVar, GroupVar, options)
-% Functions to check and cleanup inout data
+% Functions to check and clean input data
 
 % Make sure that TimeVar, EventVar, GroupVar are all column vectors
 % and not row vectors
