@@ -1,7 +1,3 @@
-% Modification of Anders Berglund's excellent MatSurv function to accept
-% more than two groups. Also implemented custom ordering of groups. Added
-% option for legend to be off (default: on);
-% -Patrick Leo, CCIPD
 function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 % USAGE:
 %   MatSurv(TimeVar, EventVar, GroupVar,'param', value, ...) creates a Kaplan-Meier plot,
@@ -229,7 +225,11 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 %   More examples can be found at: https://github.com/aebergl/MatSurv
 %
 % *** Anders Berglund ***
-
+%
+% Modification of Anders Berglund's excellent MatSurv function to accept
+% more than two groups. Also implemented custom ordering of groups. Added
+% option for legend to be off (default: on);
+% -Patrick Leo, CCIPD
 
 
 % Check TimeVar, EventVar, GroupVar variables
