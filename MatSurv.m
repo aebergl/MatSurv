@@ -455,14 +455,13 @@ else % Creat KM-Plot
     
     if options.DispP
         txt_str(1) = {sprintf('p = %.3g',p)};
-        if options.DispHR
+        if options.DispHR && isfield(options,'HR_logrank')
             if ~options.Use_HR_MH
                 if options.InvHR
                     txt_str(2) = {sprintf('HR = %.3g (%.3g - %.3g)',stats.HR_logrank_Inv, stats.HR_95_CI_logrank_Inv(1), stats.HR_95_CI_logrank_Inv(2))};
                 else
                     txt_str(2) = {sprintf('HR = %.3g (%.3g - %.3g)',stats.HR_logrank, stats.HR_95_CI_logrank(1), stats.HR_95_CI_logrank(2))};
                 end
-                
             else
                 if options.InvHR
                     txt_str(2) = {sprintf('HR = %.3g (%.3g - %.3g)',stats.HR_MH_Inv, stats.HR_95_CI_MH_Inv(1), stats.HR_95_CI_MH_Inv(2))};
@@ -545,16 +544,14 @@ else % Creat KM-Plot
     end
 end
 
-if options.Print
+if options.Print 
     fprintf('\n')
-    fprintf('p = %.2f\n',stats.p_MC)
-    if options.CalcHR
-        for k = 1:length(stats.HR_logrank)
-            if options.InvHR
-                fprintf('HR = %.2f (%.2f - %.2f)\n',stats.HR_logrank_Inv(k), stats.HR_95_CI_logrank_Inv(1), stats.HR_95_CI_logrank_Inv(2));
-            else
-                fprintf('HR = %.2f (%.2f - %.2f)\n',stats.HR_logrank(k), stats.HR_95_CI_logrank(1), stats.HR_95_CI_logrank(2));
-            end
+    fprintf('p = %.3g\n',stats.p_MC)
+    if options.CalcHR && isfield(options,'HR_logrank')
+        if options.InvHR
+            fprintf('HR = %.3g (%.3g - %.3g)\n',stats.HR_logrank_Inv, stats.HR_95_CI_logrank_Inv(1), stats.HR_95_CI_logrank_Inv(2));
+        else
+            fprintf('HR = %.3g (%.3g - %.3g)\n',stats.HR_logrank, stats.HR_95_CI_logrank(1), stats.HR_95_CI_logrank(2));
         end
     end
     for i = 1: DATA.numGroups
@@ -562,6 +559,7 @@ if options.Print
     end
     fprintf('\n')
 end
+
 % Define output variables dependent of varargout
 if nargout > 0
     varargout{1} = p;
@@ -927,11 +925,11 @@ elseif (isvector(options.CutPoint)) && isnumeric(GroupVar)
     DATA.GROUPS(i+1).EventVar = EventVarBin(indx);
 end
 
-%Hazard ration can only be calculated if there is two groups
-if DATA.numGroups ~= 2
-    options.DispHR = 0;
-    options.CalcHR = 0;
-end
+% %Hazard ration can only be calculated if there is two groups
+% if DATA.numGroups ~= 2
+%     options.DispHR = 0;
+%     options.CalcHR = 0;
+% end
 
 end
 
