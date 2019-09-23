@@ -455,7 +455,7 @@ else % Creat KM-Plot
     
     if options.DispP
         txt_str(1) = {sprintf('p = %.3g',p)};
-        if options.DispHR && isfield(options,'HR_logrank')
+        if options.DispHR && isfield(stats,'HR_logrank')
             if ~options.Use_HR_MH
                 if options.InvHR
                     txt_str(2) = {sprintf('HR = %.3g (%.3g - %.3g)',stats.HR_logrank_Inv, stats.HR_95_CI_logrank_Inv(1), stats.HR_95_CI_logrank_Inv(2))};
@@ -547,7 +547,7 @@ end
 if options.Print 
     fprintf('\n')
     fprintf('p = %.3g\n',stats.p_MC)
-    if options.CalcHR && isfield(options,'HR_logrank')
+    if options.CalcHR && isfield(stats,'HR_logrank')
         if options.InvHR
             fprintf('HR = %.3g (%.3g - %.3g)\n',stats.HR_logrank_Inv, stats.HR_95_CI_logrank_Inv(1), stats.HR_95_CI_logrank_Inv(2));
         else
