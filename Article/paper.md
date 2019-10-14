@@ -1,5 +1,22 @@
-Summary
-=======
+---
+title: "MatSurv: Survival analysis and visualization in Matlab"
+tags: 
+  - MATLAB
+  - survival analysis
+authors: 
+  - name: Jordan H Creed
+    affiliation: 1
+  - name: Travis A Gerke
+    affiliation: 1
+  - name: Anders E Berglund
+    affiliation: 1
+affiliations: 
+  - name: Moffitt Cancer Center, Tampa, FL
+    index: 1
+bibliography: paper.bib
+---
+
+# Summary
 
 Survival analysis is a statistical tool for evaluating time-to-event
 data that is widely applied across research disciplines. Commonly
@@ -20,8 +37,7 @@ multiple groups. In addition, MatSurv allows the user to easily modify
 the appearance of the created figure. The graphics were inspried by the
 `survminer` R-package (Kassambara 2018).
 
-Use
-===
+# Use
 
 MatSurv uses the Mantel-Cox, sometimes called the Mantel-Haenszel,
 log-rank test. Users have two options for calculating HRs: the log-rank
@@ -43,7 +59,10 @@ observed or censored, `EventVar`, a vector or cell array defining events
 or censoring, and `GroupVar`, a vector or cell array defining the
 comparison groups (see example code below).
 
+```
     [p,fh,stats]=MatSurv([], [], [], 'Xstep', 4, 'Title', 'MatSurv KM-Plot');
+
+```
 
 The function returns three pieces `p`, the log-rank p-value, `fh`, the
 KM-plot figure handle, and `stats`, which are additional statistics from
@@ -58,8 +77,7 @@ values, however this is a parameter that can be changed by the user.
 The MatSurv software has no dependencies on toolboxes and runs
 completely on base MATLAB functions.
 
-Comparison
-==========
+# Comparison
 
 The MatSurv output is comparable to that from `proc lifetest` in SAS and
 `ggsurvplot` in R. Code for reproducing similar output in R and SAS are
@@ -68,22 +86,28 @@ SAS and MatSurv).
 
 ### R
 
+```
     fit <- survfit(survobj ~ RISK_CYTO, data=dat)
 
     ggsurvplot(fit, risk.table=TRUE, pval=TRUE, risk.table.y.text.col=TRUE, risk.table.y.text=FALSE, break.time.by=24)
+```
 
 ### SAS
 
+```
     proc lifetest data=lamlv2(where=(RISK_CYTO ^= 'N.D.')) intervals=(0 to 120 by 24) timelist = (0 to 120 by 24)  plots=survival(atrisk=0 to 120 by 24 test);
     time OS_MONTHS*Surv(0);
     strata RISK_CYTO/test=logrank;
     run;
+```
 
 ### MatSurv
 
+```
     load laml_RC_data.mat
 
     [p,fh,stats]=MatSurv(laml_RC_TimeVar, laml_RC_EventVar,  laml_RC_GroupVar,... 'GroupsToUse', {'Good', 'Intermediate', 'Poor'}, 'Xstep', 24);
+```
 
 ![](figure_20181022.png)
 
@@ -168,13 +192,11 @@ long-rank test in MatSurv, SAS, and R are provided below (Table 1).
 </tbody>
 </table>
 
-Acknowledgements
-================
+# Acknowledgements
 
 This project has recieved funding from
 
-References
-==========
+# References
 
 Kassambara, A. 2018. “Survminer.” *GitHub Repository*.
 <https://github.com/kassambara/survminer>; GitHub.

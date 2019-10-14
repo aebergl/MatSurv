@@ -13,7 +13,7 @@ authors:
 affiliations: 
   - name: Moffitt Cancer Center, Tampa, FL
     index: 1
-bibliography: matsurv_bib.bib
+bibliography: paper.bib
 # output: md_document
 ---
 
@@ -81,6 +81,6 @@ LAML | HGF [6,12] | 16.78 | 2.27 E-4 | 16.78 | 2.27E-4 | 16.8 | 2.27E-4 |
 
 # Acknowledgements
 
-This project has recieved funding from 
+This work was supported in part by NCI Cancer Center Support Grant (P30-CA076292). 
 
 # References
