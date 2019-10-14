@@ -13,7 +13,7 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 %   censored. Values less than zero will be removed by default
 %
 % * 'EventVar' is a vector or cell array defining events or censored
-%   observation. Events are defined with a 1 and censored point with a 0. By
+%   observations. Events are defined with a 1 and censored point with a 0. By
 %   default 'Dead', 'Deceased', 'Relapsed', 'Yes', 'Event' 'Progression' &
 %   'Progressed' are considered as events.
 %   'Alive', 'Living', 'Not Relapsed', 'DiseaseFree', 'No' 'NoEvent'
