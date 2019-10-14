@@ -155,7 +155,7 @@ load laml_HGF_gene_data.mat
 * `TimeMin`: Scalar defining minimum valid time point. Subjects with time
   values below this will be removed. (default: 0)
 
-* `TimeMAx`: Scalar value defining righ censoring time. Subjects with
+* `TimeMAx`: Scalar value defining right censoring time. Subjects with
   `TimeVar` > `TimeMax` will be set to `TimeMax` and considered as censored.
   (default: [])
 
@@ -165,10 +165,17 @@ load laml_HGF_gene_data.mat
 * `NoWarnings`: A true/false value which, if true, no warnings are printed
   if subjects are removed. (default: false)
 
+* 'MedianLess': By default 'x < median' is used for median cut, but if false
+  'x > median' is used instead, only affect the results when there
+  is an odd number of samples (default: true)
+ 
+
 KM plot options
+* `legend`: Whether to show group legend. Default: true
+
 * `LineColor`: Either a matrix of size numLevels-by-3 representing the
    colormap to be used, or a string for a MATLAB colormap (lines, parula,
-   cool, prism) or 'JCO' 'nejm' 'Lancet' 'Science' 'Nature','lines' for a
+   cool, prism) or 'JCO' 'nejm' 'Lancet' 'Science' 'Nature' 'lines' for a
    set of journal dependent palettes or custom default 'aeb01' (default:'aeb01')
 
 * `FlipGroupOrder`: Flips the order of the groups in the legend.
@@ -194,9 +201,15 @@ KM plot options
 
 * `DispHR`: A true/false value which, if true, the HR
   is displayed on the KM plot. (default: true)
+  
+* `Use_HR_MH`: A true/false value which, if true, Mantel-Haenszel HR
+   is displayed instead of the logrank HR. (default: true)
 
 * `InvHR`: A true/false value which, if true, the inverted HR value
   is displayed on the KM plot. (default: false)
+  
+* `DrawMSL`: A true/false value which, if true, a line for the median
+  survival time is drawn in the KM-plot. (default: false)
 
 * `XLim`: Vector defining the x-limit. Does not affect the log-rank test.
   (default: automatic)
@@ -227,7 +240,7 @@ KM plot options
 
 * `XMinorTick`: Scalar defining the number of minor ticks between major x-ticks. (Default: 1)
 
-* `Xlabel`: Text string for x-label (Default: 'Time(Months)')
+* `Xlabel`: Text string for x-label (Default: 'Time (Months)')
 
 * `XlabelOptions`: MATLAB Name-value pair arguments for x-label. (Default: '')
 
@@ -252,9 +265,9 @@ KM plot options
 * `YTickFontSize`: Scalar describing y-tick font size change compared
   to base font size. (Default: -2)
 
-* `Title`: Text string for title. (Default: ' ' )
+* `Title`: Text string for title. (Default:'')
 
-* `TitleOptions`: MATLAB name-value pair arguments for title. (Default: '')
+* `TitleOptions`: MATLAB name-value pair arguments for title. (Default:'')
 
 * `LegendFontSize`: Scalar describing legend font size change compared
   to base font size. (Default: -2)
