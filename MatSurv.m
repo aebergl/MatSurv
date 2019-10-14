@@ -70,12 +70,12 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 % * 'TimeMin': Scalar defining minimum valid time point. Subjects with time
 %   values below this will be removed. (default: 0)
 %
-% * 'TimeMax': Scalar value defining righ censoring time. Subjects with
+% * 'TimeMax': Scalar value defining right censoring time. Subjects with
 %   TimeVar > TimeMax will be set to TimeMax and considered as censored.
 %   (default: [])
 %
 % * 'PairWiseP': A true/false for calculating pairwise log rank test
-%   between group pairs, useful if there is more than two groups. (default: false)
+%   between group pairs, useful if there are more than two groups. (default: false)
 %
 % * 'Print': A true/false value which, if true, survival statistics are
 %   printed in the command window(default: true)
@@ -109,7 +109,7 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 % * 'RT_position': Vector defining the Risk Table axes for the KM plot
 %   (default: [0.3 0.05 0.68 0.20])
 %
-% * 'TimeUnit': String defining time unit displayd on the x-axis.
+% * 'TimeUnit': String defining time unit displayed on the x-axis.
 %   (default: 'Months')
 %
 % * 'BaseFontSize': Base font size for all text in the plot
@@ -141,7 +141,7 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 %   'LineStyle',{'-','--',':','-.'}
 %   (Default: {'-'})
 %
-% * 'CensorLineWidth': Scalar defining the linewith of the censored ticks
+% * 'CensorLineWidth': Scalar defining the line width of the censored ticks
 %   (default: 2)
 %
 % * 'CensorLineLength': Scalar defining the length of the censored ticks
@@ -204,9 +204,9 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 %   gives the same colors as the groups in the KM plot while 'k' would make
 %   them all black (Default: 'same')
 %
-% * 'RT_Title': Text string for Risk Table Title (Default: '' )
+% * 'RT_Title': Text string for Risk Table Title (Default:'')
 %
-% * 'RT_TitleOptions': MATLAB Name-value pair arguments for Risk Table Titel (Default: '')
+% * 'RT_TitleOptions': MATLAB Name-value pair arguments for Risk Table Titel (Default:'')
 %
 % * 'RT_YLabel': True/False for displaying the group names on the Risk table
 %   Y-axis (Default: True )
@@ -214,10 +214,10 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 % * 'CensorInRT': True/False for whether number censored should be listed
 % in risk table (Default: False)
 %
-% * 'RTtitleAlignment': Where RT title should be algined (Default: middle)
+% * 'RTtitleAlignment': Where RT title should be aligned (Default: middle)
 %
 %   EXAMPLES:
-%   [p,fh,stats] = MatSurv([], [], [],'Xstep',4,'Title','MatSurv KM-Plot','FlipColor',1,'XMinorTick',3);
+%   [p,fh,stats] = MatSurv([], [], [],'Xstep',4,'FlipColor',1,'XMinorTick',3);
 %
 %
 % MatSurv do NOT use any toolboxes
