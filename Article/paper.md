@@ -1,5 +1,5 @@
 ---
-title: "MatSurv: Survival analysis and visualization in Matlab"
+title: "MatSurv: Survival analysis and visualization in MATLAB"
 tags: 
   - MATLAB
   - survival analysis
