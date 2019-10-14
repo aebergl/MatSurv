@@ -165,7 +165,7 @@ load laml_HGF_gene_data.mat
 * `NoWarnings`: A true/false value which, if true, no warnings are printed
   if subjects are removed. (default: false)
 
-* 'MedianLess': By default 'x < median' is used for median cut, but if false
+* `MedianLess`: By default 'x < median' is used for median cut, but if false
   'x > median' is used instead, only affect the results when there
   is an odd number of samples (default: true)
  
