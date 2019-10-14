@@ -23,7 +23,7 @@ The following code loads the data from "Freireich, EJ et al. 1963, Blood, 21, 69
  
 ```matlab
 
-[p,fh,stats]=MatSurv([], [], [],'Xstep',4,'Title','MatSurv KM-Plot');
+[p,fh,stats]=MatSurv([], [], [],'Xstep',4);
 
 ```
 <img src="/figures/Example_01.png" alt="MatSurv example" width="600">
@@ -50,7 +50,7 @@ INPUTS:
   censored. Values equal or less than zero will be removed by default
 
 * `EventVar` is a vector or cell array defining events or censored
-  observation. Events are defined with a 1 and censored point with a 0. By
+  observations. Events are defined with a 1 and censored point with a 0. By
   default 'Dead', 'Deceased', 'Relapsed', 'Yes' are considered as events.
   'Alive', 'Living', 'Not Relapsed', 'DiseaseFree', 'No' are considered as censored.
   'EventDefinition' can be used to define other types of events. 
@@ -73,7 +73,7 @@ In the example below, we show how we can change some of the properties of the KM
 
 ```matlab
  
-[p,fh,stats]=MatSurv([],[],[],'Xstep',4,'Title','MatSurv_KM Plot',...
+[p,fh,stats]=MatSurv([],[],[],'Xstep',4,...
 'TitleOptions',{'Color','r','Interpreter','none'},'InvHR',1,...
 'Xlim',32,'XMinorTick',3,'LineColor',[0 0 1;1 0 1],'LineStyle',{'-',':'},...
 'LineWidth',3,'CensorLineColor','k','RT_Title','Risk Table');
