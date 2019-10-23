@@ -61,7 +61,7 @@ or censoring, and `GroupVar`, a vector or cell array defining the
 comparison groups (see example code below).
 
 ```
-    [p,fh,stats]=MatSurv([], [], [], 'Xstep', 4, 'Title', 'MatSurv KM-Plot');
+[p,fh,stats]=MatSurv([], [], [], 'Xstep', 4, 'Title', 'MatSurv KM-Plot');
 
 ```
 
@@ -88,110 +88,52 @@ SAS and MatSurv).
 ### R
 
 ```
-    fit <- survfit(survobj ~ RISK_CYTO, data=dat)
+fit <- survfit(survobj ~ RISK_CYTO, data=dat)
 
-    ggsurvplot(fit, risk.table=TRUE, pval=TRUE, risk.table.y.text.col=TRUE, risk.table.y.text=FALSE, break.time.by=24)
+ggsurvplot(fit,
+     risk.table=TRUE,
+     pval=TRUE,
+     risk.table.y.text.col=TRUE,
+     risk.table.y.text=FALSE,
+     break.time.by=24)
 ```
 
 ### SAS
 
 ```
-    proc lifetest data=lamlv2(where=(RISK_CYTO ^= 'N.D.')) intervals=(0 to 120 by 24) timelist = (0 to 120 by 24)  plots=survival(atrisk=0 to 120 by 24 test);
-    time OS_MONTHS*Surv(0);
-    strata RISK_CYTO/test=logrank;
-    run;
+proc lifetest data=lamlv2(where=(RISK_CYTO ^= 'N.D.')) 
+intervals=(0 to 120 by 24) timelist = (0 to 120 by 24)  
+plots=survival(atrisk=0 to 120 by 24 test);
+time OS_MONTHS*Surv(0);
+strata RISK_CYTO/test=logrank;
+run;
 ```
 
 ### MatSurv
 
 ```
-    load laml_RC_data.mat
+load laml_RC_data.mat
 
-    [p,fh,stats]=MatSurv(laml_RC_TimeVar, laml_RC_EventVar,  laml_RC_GroupVar,... 'GroupsToUse', {'Good', 'Intermediate', 'Poor'}, 'Xstep', 24);
+[p,fh,stats]=MatSurv(laml_RC_TimeVar, laml_RC_EventVar,
+  laml_RC_GroupVar,... 'GroupsToUse',
+   {'Good', 'Intermediate', 'Poor'}, 'Xstep', 24);
 ```
 
-![](figure_20181022.png)
+![Figure 1](figure_20181022.png)
 
 The results from MatSurv have been compared against both SAS and R and
 found to return similar estimates. The Chi-Sq values and p-calues for a
 long-rank test in MatSurv, SAS, and R are provided below (Table 1).
 
-<table>
-<thead>
-<tr class="header">
-<th>Data</th>
-<th>Groups</th>
-<th style="text-align: center;">MatSurv</th>
-<th style="text-align: center;">MatSurv</th>
-<th style="text-align: center;">SAS</th>
-<th style="text-align: center;">SAS</th>
-<th style="text-align: center;">Survminer</th>
-<th style="text-align: center;">Survminer</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td></td>
-<td></td>
-<td style="text-align: center;"><strong>chi-sq</strong></td>
-<td style="text-align: center;"><strong>p</strong></td>
-<td style="text-align: center;"><strong>chi-sq</strong></td>
-<td style="text-align: center;"><strong>p</strong></td>
-<td style="text-align: center;"><strong>chi-sq</strong></td>
-<td style="text-align: center;"><strong>p</strong></td>
-</tr>
-<tr class="even">
-<td>Freireich</td>
-<td>Groups</td>
-<td style="text-align: center;">16.79</td>
-<td style="text-align: center;">4.17E-5</td>
-<td style="text-align: center;">16.79</td>
-<td style="text-align: center;">4.17E-5</td>
-<td style="text-align: center;">16.8</td>
-<td style="text-align: center;">4.17E-5</td>
-</tr>
-<tr class="odd">
-<td>LAML</td>
-<td>RISK_CYTO</td>
-<td style="text-align: center;">24.85</td>
-<td style="text-align: center;">4.02E-6</td>
-<td style="text-align: center;">24.85</td>
-<td style="text-align: center;">&lt; 0.001</td>
-<td style="text-align: center;">24.8</td>
-<td style="text-align: center;">4.02E-6</td>
-</tr>
-<tr class="even">
-<td>LAML</td>
-<td>HGF Median</td>
-<td style="text-align: center;">6.63</td>
-<td style="text-align: center;">0.01</td>
-<td style="text-align: center;">6.63</td>
-<td style="text-align: center;">0.01</td>
-<td style="text-align: center;">6.6</td>
-<td style="text-align: center;">0.01</td>
-</tr>
-<tr class="odd">
-<td>LAML</td>
-<td>HGF Quartiles</td>
-<td style="text-align: center;">13.01</td>
-<td style="text-align: center;">3.09E-4</td>
-<td style="text-align: center;">13.01</td>
-<td style="text-align: center;">3.09E-4</td>
-<td style="text-align: center;">13.0</td>
-<td style="text-align: center;">30.9E-4</td>
-</tr>
-<tr class="even">
-<td>LAML</td>
-<td>HGF [6,12]</td>
-<td style="text-align: center;">16.78</td>
-<td style="text-align: center;">2.27 E-4</td>
-<td style="text-align: center;">16.78</td>
-<td style="text-align: center;">2.27E-4</td>
-<td style="text-align: center;">16.8</td>
-<td style="text-align: center;">2.27E-4</td>
-</tr>
-</tbody>
-</table>
+| Data      | Groups        |MatSurv         |SAS             |Survminer       |
+|:---------:| :------------:|:-----:|:------:|:-----:|:------:|:-----:|:------:|  
+|           |               |chi-sq |p       |chi-sq |p       |chi-sq |p       |
+| Freireich | Groups        |16.79  |4.17E-5 |16.79  |4.17E-5 |16.8   |4.17E-5 |
+| LAML      | RISK_CYTO     |24.85  |4.02E-6 |24.85  |< 0.001 |24.8   |4.02E-6 |
+| LAML      | HGF Median    |6.63   |0.01    |6.63   |0.01    |6.6    |0.01    |
+| LAML      | HGF Quartiles |13.01  |3.09E-4 |13.01  |3.09E-4 |13.0   |3.09E-4 |
+| LMAL      | HGF [6,12]    |16.78  |2.27E-4 |16.78  |2.27E-4 |16.8   |2.24E-4 |
+
 
 # Acknowledgements
 
