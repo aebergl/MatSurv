@@ -119,7 +119,7 @@ load laml_RC_data.mat
    {'Good', 'Intermediate', 'Poor'}, 'Xstep', 24);
 ```
 
-![Figure 1](figure_20181022.png)
+![KM plots from Survminer, SAS and MatSurv](figure_20181022.png)
 
 The results from MatSurv have been compared against both SAS and R and
 found to return similar estimates. The Chi-Sq values and p-calues for a
