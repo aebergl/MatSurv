@@ -125,15 +125,14 @@ The results from MatSurv have been compared against both SAS and R and
 found to return similar estimates. The Chi-Sq values and p-calues for a
 long-rank test in MatSurv, SAS, and R are provided below (Table 1).
 
-|:---------:| :------------:|------:|:------:|------:|:------:|--------:|:------:|  
-| Data      | Groups        |MatSurv|        |SAS    |        |Survminer|        |
-|:---------:| :------------:|:-----:|:------:|:-----:|:------:|:-------:|:------:|  
-|           |               |chi-sq |p       |chi-sq |p       |chi-sq   |p       |
-| Freireich | Groups        |16.79  |4.17E-5 |16.79  |4.17E-5 |16.8     |4.17E-5 |
-| LAML      | RISK_CYTO     |24.85  |4.02E-6 |24.85  |< 0.001 |24.8     |4.02E-6 |
-| LAML      | HGF Median    |6.63   |0.01    |6.63   |0.01    |6.6      |0.01    |
-| LAML      | HGF Quartiles |13.01  |3.09E-4 |13.01  |3.09E-4 |13.0     |3.09E-4 |
-| LMAL      | HGF [6,12]    |16.78  |2.27E-4 |16.78  |2.27E-4 |16.8     |2.24E-4 |
+| Data      | Groups        |MatSurv|MatSurv |SAS    | SAS    |Survminer| Survminer|
+|:---------:| :------------:|:-----:|:------:|:-----:|:------:|:-------:|:--------:|  
+|           |               |chi-sq |p       |chi-sq |p       |chi-sq   |p         |
+| Freireich | Groups        |16.79  |4.17E-5 |16.79  |4.17E-5 |16.8     |4.17E-5   |
+| LAML      | RISK_CYTO     |24.85  |4.02E-6 |24.85  |< 0.001 |24.8     |4.02E-6   |
+| LAML      | HGF Median    |6.63   |0.01    |6.63   |0.01    |6.6      |0.01      |
+| LAML      | HGF Quartiles |13.01  |3.09E-4 |13.01  |3.09E-4 |13.0     |3.09E-4   |
+| LMAL      | HGF [6,12]    |16.78  |2.27E-4 |16.78  |2.27E-4 |16.8     |2.24E-4   |
 
 
 # Acknowledgements
