@@ -40,7 +40,7 @@ the appearance of the created figure. The graphics were inspired by the
 
 # Use
 
-MatSurv uses the log-rank (Mantel-Cox), test to calculate the p-value.
+MatSurv uses the log-rank (Mantel-Cox) test to calculate the p-value.
 Users have two options for calculating HRs: the log-rank
 or Mantel-Haneszel approach. In the log-rank approach, HR =
 (O<sub>a</sub>/E<sub>a</sub>)/(O<sub>b</sub>/E<sub>b</sub>), where
@@ -71,7 +71,7 @@ the log-rank test. The user can further customize the style of their
 KM-plot (line colors, labels, ticks, etc.) by making changes to the
 figure handle.
 
-When MatSurv is creating the groups based in the median value, the
+When MatSurv is creating the groups based on the median value, the
 default option uses values less than the median compared to all other
 values, however this is a parameter that can be changed by the user.
 
