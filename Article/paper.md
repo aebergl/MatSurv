@@ -19,13 +19,13 @@ bibliography: paper.bib
 
 # Summary
 
-Survival analysis is a statistical tool for evaluating time-to-event
+Survival analysis is a set of methods for evaluating time-to-event
 data that is widely applied across research disciplines. Commonly
 reported elements of survival analysis include log-rank tests, hazard
 ratios (HR) and Kaplan-Meier (KM) curves. KM-curves are used to compare
-suvival durations between two groups and give users a particular
+survival durations between two or more groups and give users a particular
 estimate of survival probability at a given time; log-rank tests are
-used to conduct statistical inference on suvival durations between
+used to conduct statistical inference on survival durations between
 groups; and HRs provide a ratio of the hazard rates between groups.
 MATLAB (MATLAB 2018A) currently lacks functions to easily create
 KM-plots with accompanying risk tables. Furthermore, MATLAB does not
@@ -35,13 +35,13 @@ Toolbox. Our goal for MatSurv is to provide an easy-to-use tool that
 creates publication quality KM-plots with corresponding risk tables. The
 statistical procedures built into MatSurv can be used to compare two or
 multiple groups. In addition, MatSurv allows the user to easily modify
-the appearance of the created figure. The graphics were inspried by the
+the appearance of the created figure. The graphics were inspired by the
 `survminer` R-package (Kassambara 2018).
 
 # Use
 
-MatSurv uses the Mantel-Cox, sometimes called the Mantel-Haenszel,
-log-rank test. Users have two options for calculating HRs: the log-rank
+MatSurv uses the log-rank (Mantel-Cox), test to calculate the p-value.
+Users have two options for calculating HRs: the log-rank
 or Mantel-Haneszel approach. In the log-rank approach, HR =
 (O<sub>a</sub>/E<sub>a</sub>)/(O<sub>b</sub>/E<sub>b</sub>), where
 O<sub>a</sub> & O<sub>b</sub> are the observed events in each group and
@@ -119,11 +119,11 @@ load laml_RC_data.mat
    {'Good', 'Intermediate', 'Poor'}, 'Xstep', 24);
 ```
 
-![Output for Survminer (A), SAS (B) and MatSurv (C). All three produce the same logrank p-value of 4.02E-6](figure_20191023.png)
+![Output for Survminer (A), SAS (B) and MatSurv (C). All three produce the same log-rank p-value of 4.02E-6](figure_20191023.png)
 
 The results from MatSurv have been compared against both SAS and R and
-found to return similar estimates. The Chi-Sq values and p-calues for a
-long-rank test in MatSurv, SAS, and R are provided below (Table 1).
+found to return similar estimates. The Chi-Sq values and p-values for a
+log-rank test in MatSurv, SAS, and R are provided below (Table 1).
 
 | Data      | Groups        |MatSurv|MatSurv |SAS    | SAS    |Survminer| Survminer|
 |:---------:| :------------:|:-----:|:------:|:-----:|:------:|:-------:|:--------:|  
