@@ -1,21 +1,27 @@
-# MatSurv
+# MatSurv [![View MatSurv on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://www.mathworks.com/matlabcentral/fileexchange/64582-matsurv)
 MatSurv is a simple survival analysis function for MATLAB that creates a KM plot with risk table. Survival statistics, such as log-rank p-value and hazard ratio (HR) are also calculated. The log-rank test has been evaluated to give the same results as SAS and R. The style of the KM plot is easily changed with input parameters. No additional toolboxes are needed or depended upon. MatSurv was inspired by the [survminer R-package](https://github.com/kassambara/survminer).
+
+
+
 The general usage is:
 ```matlab
 [p, fh, stats] = MatSurv(TimeVar, EventVar, GroupVar,'param', value, …)
 ```
 
 ## Table of contents ##
+- [Why MatSurv](#Why-MatSurv)
 - [Citing MatSurv](#Citing-MatSurv)
 - [Simple Example](#Simple-Example)
 - [Using MatSurv](#Using-Matsurv)
-- [More Examples](#features)
+- [More Examples](#More-Examples)
 - [List of all input options](#List-of-all-input-options)
 
 
+## Why Matsurv ##
+
 ## Citing MatSurv ##
 
-Coming soon!
+Under review in JOSS
 
 ## Simple Example ##
 
@@ -46,6 +52,7 @@ Simply put MatSurv.m in any directory of your choice and make sure it is added t
   [p, fh, stats] = MatSurv([], [], [], ... ) loads a test dataset from "Freireich, EJ et al. 1963, Blood, 21, 699-716"
 
 INPUTS:
+
 * `TimeVar` is a vector with numeric time to event, either observed or
   censored. Values equal or less than zero will be removed by default
 
@@ -59,8 +66,11 @@ INPUTS:
   If `GroupVar` is a continuous variable, median cut will be used as a default.
 
 OUTPUTS:
+
 * p       : Log-rank p-value
+
 * fh      : Figure handle for KM plot figure
+
 * stats   : Additional statistics from the log-rank test
 
 
@@ -155,7 +165,7 @@ load laml_HGF_gene_data.mat
 * `TimeMin`: Scalar defining minimum valid time point. Subjects with time
   values below this will be removed. (default: 0)
 
-* `TimeMAx`: Scalar value defining right censoring time. Subjects with
+* `TimeMax`: Scalar value defining right censoring time. Subjects with
   `TimeVar` > `TimeMax` will be set to `TimeMax` and considered as censored.
   (default: [])
 
