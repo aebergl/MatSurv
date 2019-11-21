@@ -523,8 +523,6 @@ else % Creat KM-Plot
             % extend YLim for KM-plot
             axh_KM.YLim(1) =  axh_KM.YLim(1) - 0.05 - 0.05*DATA.numGroups;
             
-            %Fix XLim
-            
             for i = 1:length(axh_KM.XTick)
                 for j = 1:DATA.numGroups
                     if(options.CensorInRT)
