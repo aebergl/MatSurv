@@ -166,6 +166,7 @@ log-rank test in MatSurv, SAS, and R are provided below (Table 1).
 # Acknowledgements
 
 This work was supported in part by NCI Cancer Center Support Grant (P30-CA076292). 
+Patrick Leo, CCIPD, for contributing to this project.
 
 # References
 
