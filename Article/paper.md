@@ -20,13 +20,27 @@ bibliography: paper.bib
 # Summary
 
 Survival analysis is a set of methods for evaluating time-to-event
-data that is widely applied across research disciplines. Commonly
+data that is widely applied across research disciplines. For example,
+it is commonly used in clinical trials to compare the effect of treatments.
+In cancer biology, it can be used to understand how low- or high-expression
+of genes affect the aggressiveness of the tumor. Time-to-event data 
+frequently include censored data points, samples where no event was observed.
+An event is, for example, death, relapse of disease, or a new metastatic tumor.
+If none of these events occur during the study period, the time to-to-event is
+unknown, we only know that no events were observed during the study time.
+The methods described below was developed for this kind of data.  For an
+in-depth introduction to survival analysis, we can recommend the book by
+Kleinbaum and David (Kleinbaum 1998). In fact, much of the code used in MatSurv is
+based on the equations given in the book. Commonly 
 reported elements of survival analysis include log-rank tests, hazard
 ratios (HR) and Kaplan-Meier (KM) curves. KM-curves are used to compare
 survival durations between two or more groups and give users a particular
 estimate of survival probability at a given time; log-rank tests are
 used to conduct statistical inference on survival durations between
-groups; and HRs provide a ratio of the hazard rates between groups.
+groups; and HRs provide a ratio of the hazard rates between groups. 
+To further improve the KM-plot, it has been suggested that the KM-plot
+always should be accomplished by a table that describe the number of
+patients that are still “at-risk” at a specific timepoint (Morris 2019). 
 MATLAB (MATLAB 2018A) currently lacks functions to easily create
 KM-plots with accompanying risk tables. Furthermore, MATLAB does not
 have a built-in log-rank test, nor is one available in any of the
@@ -38,20 +52,30 @@ multiple groups. In addition, MatSurv allows the user to easily modify
 the appearance of the created figure. The graphics were inspired by the
 `survminer` R-package (Kassambara 2018).
 
-# Use
+# MatSurv Use and Features
 
-MatSurv uses the log-rank (Mantel-Cox) test to calculate the p-value.
+MatSurv creates three different items, a KM-plot, a risk table and
+statistical results. The KM-plot shows the events and also censoring
+for the different groups and it is customizable using different input
+parameters. The risk table shows the number of patients “at-risk” for
+different time points and it is linked to the KM-plot. The statistical
+results are reported as a structure and the different values are described
+below. MatSurv uses the log-rank (Mantel-Cox) test to calculate the Chi-
+squared test statistic and corresponding p-value describing evidence against
+the null hypothesis that the curves are identical.
 Users have two options for calculating HRs: the log-rank
-or Mantel-Haneszel approach. In the log-rank approach, HR =
+or Mantel-Haenszel approach. HR can only be calculated when there are two
+groups being compared. In the log-rank approach, HR =
 (O<sub>a</sub>/E<sub>a</sub>)/(O<sub>b</sub>/E<sub>b</sub>), where
 O<sub>a</sub> & O<sub>b</sub> are the observed events in each group and
 E<sub>a</sub> & E<sub>b</sub> are the number of expected events. In the
 Mantel-Haenszel approach, HR = exp((O<sub>1</sub>-E<sub>1</sub>)/V),
 where O<sub>1</sub> is the number of observed events in a group,
 E<sub>1</sub> is the expected number of events in the same group and V
-is the total variance. Results from the log-rank approach will give
-slightly different results when compared to the Mantel-Haneszel or Cox
-regression approach, which is commonly used in R.
+is the total variance. The two methods give similar results but the log-rank
+results will not work of there is no events in one of the groups. The 95%
+confidence interval for the HR’s are also reported together with the inverse
+ of all the values.
 
 In order to use MatSurv, simply put MatSurv.m in any directory of your
 choice and make sure it is added to your path. At a minimum, the user
@@ -83,7 +107,11 @@ completely on base MATLAB functions.
 The MatSurv output is comparable to that from `proc lifetest` in SAS and
 `ggsurvplot` in R. Code for reproducing similar output in R and SAS are
 shown below as well as the output from all 3 statistical programs (R,
-SAS and MatSurv).
+SAS and MatSurv). The data used is from a classic and frequently used
+example by Freireich (Freireich 1963). In addition, we have also used
+the Acute Myeloid Leukemia (LAML) dataset (Ley 2013) from The Cancer
+Genome Atlas (TCGA). The following examples, use three different risk
+groups as well as the effect of HGF gene expression has on survival.
 
 ### R
 
@@ -132,7 +160,7 @@ log-rank test in MatSurv, SAS, and R are provided below (Table 1).
 | LAML      | RISK_CYTO     |24.85  |4.02E-6 |24.85  |< 0.001 |24.8     |4.02E-6   |
 | LAML      | HGF Median    |6.63   |0.01    |6.63   |0.01    |6.6      |0.01      |
 | LAML      | HGF Quartiles |13.01  |3.09E-4 |13.01  |3.09E-4 |13.0     |3.09E-4   |
-| LMAL      | HGF [6,12]    |16.78  |2.27E-4 |16.78  |2.27E-4 |16.8     |2.24E-4   |
+| LAML      | HGF [6,12]    |16.78  |2.27E-4 |16.78  |2.27E-4 |16.8     |2.24E-4   |
 
 
 # Acknowledgements
@@ -141,5 +169,13 @@ This work was supported in part by NCI Cancer Center Support Grant (P30-CA076292
 
 # References
 
+Kleinbaum, David G. "Survival analysis, a self‐learning text." *Biometrical Journal: Journal of Mathematical Methods in Biosciences* 40.1 (1998): 107-108.
+
+Morris TP, Jarvis CI, Cragg W, et al Proposals on Kaplan–Meier plots in medical research and a survey of stakeholder views: KMunicate *BMJ Open* 2019;9:e030215. doi: 10.1136/bmjopen-2019-030215
+
 Kassambara, A. 2018. “Survminer.” *GitHub Repository*.
 <https://github.com/kassambara/survminer>; GitHub.
+
+Acute Leukemia Group B, Freireich EJ, Gehan E, Frei E et al. The Effect of 6-Mercaptopurine on the Duration of Steroid-induced Remissions in Acute Leukemia: A Model for Evaluation of Other Potentially Useful Therapy. *Blood* 1963; 21 (6): 699–716. 
+
+Cancer Genome Atlas Research Network et al. “Genomic and epigenomic landscapes of adult de novo acute myeloid leukemia.” *The New England journal of medicine* vol. 368,22 (2013): 2059-74. doi:10.1056/NEJMoa1301689
