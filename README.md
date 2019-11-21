@@ -71,7 +71,7 @@ OUTPUTS:
 
 * fh      : Figure handle for KM plot figure
 
-* stats   : Strcuture with additional statisticstruct with fields:
+* stats   : Structure with additional statistics in the following fields:
 ```matlab
   struct with fields: 
       
