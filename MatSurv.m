@@ -170,6 +170,8 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 % * 'XTickFontSize': Scalar describing Xtick font size change compared
 %   to base font size (Default: -2)
 %
+% * 'YLim': Vector defining the range of the Y-axis  (Default: [0 1])
+%
 % * 'YTicks': Vector defining the position of the X-tick marks
 %   (Default: [0:0.2:1])
 %
@@ -197,6 +199,10 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 %   to base font size (Default: 0)
 %
 % Risk table plot options
+%
+% * 'RT_XAxis': A true/false value which, if true, a X-axis line is
+%   included in the risk table. (default: True)
+%
 % * 'RT_FontSize': Scalar describing Risk Table font size change compared
 %   to base font size (Default: 0)
 %
@@ -212,7 +218,7 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 %   Y-axis (Default: True )
 %
 % * 'CensorInRT': True/False for whether number censored should be listed
-% in risk table (Default: False)
+%   in risk table (Default: False)
 %
 % * 'RTtitleAlignment': Where RT title should be aligned (Default: middle)
 %
@@ -336,7 +342,11 @@ else % Creat KM-Plot
         axh_KM = axes(fh,'Position',options.KM_position,'NextPlot','add','tag','KM-Plot');
         axh_RT = axes(fh,'Position',options.RT_position,'tag','Risk Table');
         % No axis for the Risk Table
-        axh_RT.XAxis.Visible='off';
+        if options.RT_XAxis
+            axh_RT.XAxis.Visible='on';
+        else
+            axh_RT.XAxis.Visible='off';
+        end
         axh_RT.YAxis.Visible='off';
     end
     
@@ -400,7 +410,7 @@ else % Creat KM-Plot
     
     %Fix Y-Axis
     % Limit range from 0 to 1
-    axh_KM.YLim = [0 1];
+    axh_KM.YLim = options.YLim;
     axh_KM.YTick = options.YTick;
     YMinorStep =  (options.YTick(2) - options.YTick(1) ) / (1+options.YMinorTick);
     axh_KM.YAxis.MinorTickValues = YMinorStep:YMinorStep:1;
@@ -475,7 +485,9 @@ else % Creat KM-Plot
    
     % And now to the Risk table
     if ~options.NoRiskTable
+        axh_RT.LineWidth = 1.5;
         axh_RT.XTick=axh_KM.XTick;
+        axh_RT.XAxis.FontSize=options.BaseFontSize + options.XTickFontSize;
         % Get number of samples for each time point
         RT_X = zeros(length(axh_KM.XTick),DATA.numGroups);
         RT_Xcensor = zeros(length(axh_KM.XTick),DATA.numGroups);
@@ -491,8 +503,8 @@ else % Creat KM-Plot
             end
             
         end
-%         axh_RT.YLim = [0.5 DATA.numGroups + 0.5];
-        axh_RT.YLim = [0 DATA.numGroups + 0.5];
+        % Create RT graph for text 
+        axh_RT.YLim = [0.1 DATA.numGroups + 0.1];
         axh_RT.YTick = 1:DATA.numGroups;
         linkaxes([axh_RT,axh_KM],'x')
         
@@ -526,7 +538,6 @@ else % Creat KM-Plot
         nudge_x = abs(axh_RT.XLim(2) - axh_RT.XLim(1))/100;
         
         line(axh_RT,[left_pos-nudge_x left_pos-nudge_x],[axh_RT.YTick(1)-0.5 axh_RT.YTick(end)+0.5],'color','k','clipping','off','LineWidth',1.25)
-        
         
         %Set Y label for risk table
         if options.RT_YLabel
@@ -596,8 +607,8 @@ p.addParameter('Print',1);
 p.addParameter('MedianLess',1);
 
 % Figure Options
-p.addParameter('KM_position',[0.25 0.4 0.70 0.45]);
-p.addParameter('RT_position',[0.25 0.05 0.70 0.20]);
+p.addParameter('KM_position',[0.25 0.40 0.70 0.45]);
+p.addParameter('RT_position',[0.25 0.07 0.70 0.18]);
 p.addParameter('BaseFontSize',16);
 
 
@@ -624,6 +635,7 @@ p.addParameter('XlabelOptions',cell(0,0));
 p.addParameter('XLabelFontSize',0);
 p.addParameter('XTickFontSize',-2);
 
+p.addParameter('YLim',[0 1]);
 p.addParameter('Ylabel','Survival Probability');
 p.addParameter('YlabelOptions',cell(0,0));
 p.addParameter('YLabelFontSize',0);
@@ -637,6 +649,7 @@ p.addParameter('LegendFontSize',-2);
 p.addParameter('PvalFontSize',-2);
 
 % Risk table plot options
+p.addParameter('RT_XAxis',1);
 p.addParameter('RT_FontSize',0);
 p.addParameter('RT_Color','same');
 p.addParameter('RT_YLabel',1);
