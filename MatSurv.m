@@ -48,7 +48,7 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 % OTHER PARAMETERS (passed as parameter-value pairs)
 % * 'NoPlot': A true/false value which, if true, no figure is created
 %   (default: false)
-% 
+%
 % * 'NoRiskTable': A true/false value which, if true, no risk table is
 %   included in the KM-plot. (default: false)
 %
@@ -200,6 +200,9 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 %
 % Risk table plot options
 %
+% * 'RT_KMplot': A true/false value which, if true, the risk table is placed
+%    as a part of the KM-plot. (default: False)
+%
 % * 'RT_XAxis': A true/false value which, if true, a X-axis line is
 %   included in the risk table. (default: True)
 %
@@ -322,10 +325,10 @@ if options.NoPlot
         indx_MST = find((yb <= 0.5),1);
         if ~isempty(indx_MST)
             stats.MedianSurvivalTime(i) = xb(indx_MST);
-%         else
-%             % revert to other median
-%             [~,indx_MST] = min(yb-median(yb));
-%             stats.MedianSurvivalTime(i) = xb(indx_MST);
+            %         else
+            %             % revert to other median
+            %             [~,indx_MST] = min(yb-median(yb));
+            %             stats.MedianSurvivalTime(i) = xb(indx_MST);
         end
     end
     fh = [];
@@ -336,7 +339,7 @@ else % Creat KM-Plot
     fh=figure('Name','MatSurv KM-Plot','Color','w','Tag','MatSurv KM-Plot figure');
     
     %Create Axes
-    if options.NoRiskTable
+    if options.NoRiskTable || options.RT_InKM_Plot
         axh_KM = axes(fh,'NextPlot','add','tag','KM-Plot');
     else
         axh_KM = axes(fh,'Position',options.KM_position,'NextPlot','add','tag','KM-Plot');
@@ -449,8 +452,13 @@ else % Creat KM-Plot
         axh_KM.XLim = [0 options.XLim];
     end
     
+    if options.RT_InKM_Plot
+        axh_KM.XLim(1) = axh_KM.XLim(1) - ((axh_KM.XLim(2)-  axh_KM.XLim(1))/20);
+    end
+    
     max_X = axh_KM.XLim(2);
     Nudge_X = max_X / 50;
+    
     
     if ~isempty(options.Xstep)
         axh_KM.XTick = 0:options.Xstep:max_X;
@@ -480,14 +488,12 @@ else % Creat KM-Plot
                 end
             end
         end
-        text(axh_KM,Nudge_X,0.1,txt_str,'FontSize',options.BaseFontSize + options.PvalFontSize,'tag','p-value')
+        text(axh_KM,axh_KM.XLim(1)+Nudge_X,0.1,txt_str,'FontSize',options.BaseFontSize + options.PvalFontSize,'tag','p-value')
     end
-   
+    
     % And now to the Risk table
     if ~options.NoRiskTable
-        axh_RT.LineWidth = 1.5;
-        axh_RT.XTick=axh_KM.XTick;
-        axh_RT.XAxis.FontSize=options.BaseFontSize + options.XTickFontSize;
+        
         % Get number of samples for each time point
         RT_X = zeros(length(axh_KM.XTick),DATA.numGroups);
         RT_Xcensor = zeros(length(axh_KM.XTick),DATA.numGroups);
@@ -503,10 +509,6 @@ else % Creat KM-Plot
             end
             
         end
-        % Create RT graph for text 
-        axh_RT.YLim = [0.1 DATA.numGroups + 0.1];
-        axh_RT.YTick = 1:DATA.numGroups;
-        linkaxes([axh_RT,axh_KM],'x')
         
         % Color OptionsFor Risk Table
         if ischar(options.RT_Color) && strcmpi('same',options.RT_Color)
@@ -516,46 +518,89 @@ else % Creat KM-Plot
             cMAP_RT = repmat(cMAP_RT,DATA.numGroups,1);
         end
         
-        for i = 1:length(axh_KM.XTick)
-            for j = 1:DATA.numGroups
-                %sprintf('%u',RT_X(i,j))
-                if(options.CensorInRT)
-                    text(axh_RT,axh_RT.XTick(i),axh_RT.YTick(end-j+1),sprintf('%u (%u)',RT_X(i,j),RT_Xcensor(i,j)),...
-                    'HorizontalAlignment',options.RTtitleAlignment,'VerticalAlignment','middle',...
-                    'FontSize',options.BaseFontSize + options.RT_FontSize,'Color',cMAP_RT(j,:))
-                else
-                text(axh_RT,axh_RT.XTick(i),axh_RT.YTick(end-j+1),sprintf('%u',RT_X(i,j)),...
-                    'HorizontalAlignment',options.RTtitleAlignment,'VerticalAlignment','middle',...
-                    'FontSize',options.BaseFontSize + options.RT_FontSize,'Color',cMAP_RT(j,:))
+        if options.RT_InKM_Plot
+            
+            % extend YLim for KM-plot
+            axh_KM.YLim(1) =  axh_KM.YLim(1) - 0.05 - 0.05*DATA.numGroups;
+            
+            %Fix XLim
+            
+            for i = 1:length(axh_KM.XTick)
+                for j = 1:DATA.numGroups
+                    if(options.CensorInRT)
+                        text(axh_KM,axh_KM.XTick(i),axh_RT.YTick(end-j+1),sprintf('%u (%u)',RT_X(i,j),RT_Xcensor(i,j)),...
+                            'HorizontalAlignment',options.RTtitleAlignment,'VerticalAlignment','middle',...
+                            'FontSize',options.BaseFontSize + options.RT_FontSize,'Color',cMAP_RT(j,:))
+                    else
+                        text(axh_KM,axh_KM.XTick(i),-0.05-((j-1)*0.05),sprintf('%u',RT_X(i,j)),...
+                            'HorizontalAlignment',options.RTtitleAlignment,'VerticalAlignment','middle',...
+                            'FontSize',options.BaseFontSize + options.RT_FontSize,'Color',cMAP_RT(j,:))
+                    end
                 end
             end
-        end
-        % Create Line
-        %Get position for all text objects
-        txt_pos = [axh_RT.Children(2:end).Extent];
-        %get the second element for all text objects
-        left_pos = min(txt_pos(1:4:end));
-        nudge_x = abs(axh_RT.XLim(2) - axh_RT.XLim(1))/100;
-        
-        line(axh_RT,[left_pos-nudge_x left_pos-nudge_x],[axh_RT.YTick(1)-0.5 axh_RT.YTick(end)+0.5],'color','k','clipping','off','LineWidth',1.25)
-        
-        %Set Y label for risk table
-        if options.RT_YLabel
-            for j = 1:DATA.numGroups
-                text(axh_RT,left_pos-(nudge_x*2),axh_RT.YTick(end-j+1),DATA.GROUPS(j).GroupName,...
-                    'HorizontalAlignment','right','VerticalAlignment','middle',...
-                    'FontSize',options.BaseFontSize + options.RT_FontSize,'Color',cMAP_RT(j,:),'FontWeight','bold')
+            
+            if options.RT_YLabel
+                for j = 1:DATA.numGroups
+                    text(axh_KM,axh_KM.XLim(1)-Nudge_X/2,-0.05-((j-1)*0.05),DATA.GROUPS(j).GroupName,...
+                        'HorizontalAlignment','right','VerticalAlignment','middle',...
+                        'FontSize',options.BaseFontSize + options.RT_FontSize,'Color',cMAP_RT(j,:),'FontWeight','bold')
+                end
             end
-        end
-        % Title
-        if ~isempty(options.RT_Title)
-            ht = title(axh_RT,options.RT_Title,'FontSize',14,options.TitleOptions{:});
-            ht.VerticalAlignment='middle';
+            
+            
+            
+        else
+            axh_RT.LineWidth = 1.5;
+            axh_RT.XTick=axh_KM.XTick;
+            axh_RT.XAxis.FontSize=options.BaseFontSize + options.XTickFontSize;
+            
+            % Create RT graph for text
+            axh_RT.YLim = [0.1 DATA.numGroups + 0.1];
+            axh_RT.YTick = 1:DATA.numGroups;
+            linkaxes([axh_RT,axh_KM],'x')
+            
+            
+            for i = 1:length(axh_KM.XTick)
+                for j = 1:DATA.numGroups
+                    
+                    if(options.CensorInRT)
+                        text(axh_RT,axh_RT.XTick(i),axh_RT.YTick(end-j+1),sprintf('%u (%u)',RT_X(i,j),RT_Xcensor(i,j)),...
+                            'HorizontalAlignment',options.RTtitleAlignment,'VerticalAlignment','middle',...
+                            'FontSize',options.BaseFontSize + options.RT_FontSize,'Color',cMAP_RT(j,:))
+                    else
+                        text(axh_RT,axh_RT.XTick(i),axh_RT.YTick(end-j+1),sprintf('%u',RT_X(i,j)),...
+                            'HorizontalAlignment',options.RTtitleAlignment,'VerticalAlignment','middle',...
+                            'FontSize',options.BaseFontSize + options.RT_FontSize,'Color',cMAP_RT(j,:))
+                    end
+                end
+            end
+            % Create Line
+            %Get position for all text objects
+            txt_pos = [axh_RT.Children(2:end).Extent];
+            %get the second element for all text objects
+            left_pos = min(txt_pos(1:4:end));
+            nudge_x = abs(axh_RT.XLim(2) - axh_RT.XLim(1))/100;
+            
+            line(axh_RT,[left_pos-nudge_x left_pos-nudge_x],[axh_RT.YTick(1)-0.5 axh_RT.YTick(end)+0.5],'color','k','clipping','off','LineWidth',1.25)
+            
+            %Set Y label for risk table
+            if options.RT_YLabel
+                for j = 1:DATA.numGroups
+                    text(axh_RT,left_pos-(nudge_x*2),axh_RT.YTick(end-j+1),DATA.GROUPS(j).GroupName,...
+                        'HorizontalAlignment','right','VerticalAlignment','middle',...
+                        'FontSize',options.BaseFontSize + options.RT_FontSize,'Color',cMAP_RT(j,:),'FontWeight','bold')
+                end
+            end
+            % Title
+            if ~isempty(options.RT_Title)
+                ht = title(axh_RT,options.RT_Title,'FontSize',14,options.TitleOptions{:});
+                ht.VerticalAlignment='middle';
+            end
         end
     end
 end
 
-if options.Print 
+if options.Print
     fprintf('\n')
     fprintf('p = %.3g\n',stats.p_MC)
     if options.CalcHR && isfield(stats,'HR_logrank')
@@ -649,6 +694,7 @@ p.addParameter('LegendFontSize',-2);
 p.addParameter('PvalFontSize',-2);
 
 % Risk table plot options
+p.addParameter('RT_KMplot',0);
 p.addParameter('RT_XAxis',1);
 p.addParameter('RT_FontSize',0);
 p.addParameter('RT_Color','same');
@@ -876,7 +922,7 @@ elseif (strcmpi('Median',options.CutPoint) || isscalar(options.CutPoint)) && isn
     end
     
     DATA.GROUPS(1).TimeVar = TimeVar(indx_Above);
-    DATA.GROUPS(1).EventVar = EventVarBin(indx_Above);    
+    DATA.GROUPS(1).EventVar = EventVarBin(indx_Above);
     DATA.GROUPS(2).TimeVar = TimeVar(indx_Below);
     DATA.GROUPS(2).EventVar = EventVarBin(indx_Below);
     
@@ -959,7 +1005,7 @@ EventVarBin = zeros(size(EventVar));
 
 % Check if its a string array and convert to cell array
 if isstring(EventVar)
-    EventVar = cellstr(EventVar);    
+    EventVar = cellstr(EventVar);
 end
 
 if islogical(EventVar) % Set TRUE to 1
