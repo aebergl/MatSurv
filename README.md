@@ -113,7 +113,7 @@ load laml_HGF_gene_data.mat
 % Using median cut
 [p,fh,stats]=MatSurv(laml_HGF_gene_TimeVar,laml_HGF_gene_EventVar,HGF_gene,'Xstep',12,'InvHR',1);
 
-% Using qurtile
+% Using quartile
 [p,fh,stats]=MatSurv(laml_HGF_gene_TimeVar,laml_HGF_gene_EventVar,HGF_gene,'Xstep',12,'InvHR',1,'CutPoint','quartile');
 
 % Using Two Cut points
