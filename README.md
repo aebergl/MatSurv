@@ -278,6 +278,8 @@ KM plot options
 
 * `XTickFontSize`: Scalar describing x-tick font size change compared
   to base font size. (Default: -2)
+  
+* `YLim`: Vector defining the range of the Y-axis  (Default: [0 1])
 
 * `YTicks`: Vector defining the position of the x-tick marks.
   (Default: [0:0.2:1])
@@ -305,6 +307,9 @@ KM plot options
   to base font size. (Default: 0)
 
 Risk table plot options
+* `RT_XAxis`: A true/false value which, if true, a X-axis line is
+  included in the risk table. (default: True)
+
 * `RT_FontSize`: Scalar describing risk table font size change compared
   to base font size. (Default: 0)
 
