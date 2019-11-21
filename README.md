@@ -18,7 +18,7 @@ The general usage is:
 
 
 ## Why Matsurv ##
-
+MatSurv allows MATLAB users to create KM-plots with a risk table and also to perform a log-rank test between two or more groups. MatSurv also provides a fine grained customization of the KM-plots, making it suitiable for publications. MatSurv hopefully will make the life of fellow Bioinformaticians (and other professionals) who prefer MATLAB over R easier. 
 ## Citing MatSurv ##
 
 Under review in JOSS
@@ -71,8 +71,24 @@ OUTPUTS:
 
 * fh      : Figure handle for KM plot figure
 
-* stats   : Additional statistics from the log-rank test
-
+* stats   : Strcuture with additional statisticstruct with fields:
+```matlab
+  struct with fields: 
+      
+          GroupNames: Cell with group names 
+                p_MC: log rank p-value (Mantel-Cox) 
+             Chi2_MC: Chi square (Mantel-Cox) 
+          HR_logrank: Hazard Ratio (log rank)
+    HR_95_CI_logrank: 95% Confidence intervals [lower upper]
+      HR_logrank_Inv: Inverted Hazard Ratio (log rank)
+HR_95_CI_logrank_Inv: Inverted 95% Confidence intervals [lower upper]
+               HR_MH: Hazard Ratio (Mantel-Haenszel)
+         HR_95_CI_MH: 95% Confidence intervals [lower upper]
+           HR_MH_Inv: Inverted Hazard Ratio (Mantel-Haenszel)
+     HR_95_CI_MH_Inv: Inverted 95% Confidence intervals [lower upper]
+  MedianSurvivalTime: Median survival time for each group
+  
+```
 
 ## More Examples ##
 
@@ -93,7 +109,9 @@ In the example below, we show how we can change some of the properties of the KM
 
 ### Example with multiple groups ###
 
-This example is taken from the TCGA laml data set. Obtaining the data from cBioPortal can be found in the MatSurv/Article/MATLAB/get_laml_RC_data.m script. For this example we will load the data directly.
+This example is taken from the TCGA laml data set. Obtaining the data from cBioPortal can be found in the MatSurv/Article/MATLAB/get_laml_RC_data.m script. The samples are diveded into three groups based on their Cyto score. It is clear from the KM-Plot below that these groups have different outcomes.
+
+For this example we will load the data directly.
 
 ```matlab
 load laml_RC_data.mat
@@ -105,7 +123,8 @@ load laml_RC_data.mat
 
 ### Example with gene expression data ###
 
-This example is also taken from the TCGA laml dataset but we also get the RNAseq gene expression data for the HGF gene. Obtaining the data from cBioPortal can be found in the MatSurv/Article/MATLAB/get_laml_HGF_gene_data.m script. For this example we will load the data directly.
+This example is also taken from the TCGA LAML dataset but we in this example we will be using RNAseq gene expression data for the hepatocyte growth factor (HGF) gene. HGF gene expression has been related to outcome in a variety of cancers, including of the lungs, pancreas, thyroid, colon, and breast. Obtaining the data from cBioPortal can be found in the MatSurv/Article/MATLAB/get_laml_HGF_gene_data.m script. The expression level of a gene is continues and if no prior knowledge is available, the median is frequqently used to divide the samples into two groups, see the first graph below. Using the top 25% and bottom 25%, quartiles, is also frequqntly used, see the second graph below. Finally, if one or several cut-points level are known, these can also be used, third graph below. 
+For this example we will load the data directly. 
 
 ```matlab
 load laml_HGF_gene_data.mat
