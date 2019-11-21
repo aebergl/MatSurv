@@ -18,7 +18,7 @@ The general usage is:
 
 
 ## Why Matsurv ##
-MatSurv allows MATLAB users to create KM-plots with a risk table and also to perform a log-rank test between two or more groups. MatSurv also provides a fine grained customization of the KM-plots, making it suitiable for publications. MatSurv hopefully will make the life of fellow Bioinformaticians (and other professionals) who prefer MATLAB over R easier. 
+MatSurv allows MATLAB users to create KM-plots with a risk table and also to perform a log-rank test between two or more groups. MatSurv also provides a fine grained customization of the KM-plots, making it suitiable for publications. MatSurv hopefully will make the life easier for fellow Bioinformaticians (and other professionals) who prefer MATLAB over R. 
 ## Citing MatSurv ##
 
 Under review in JOSS
