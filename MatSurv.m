@@ -339,7 +339,7 @@ else % Creat KM-Plot
     fh=figure('Name','MatSurv KM-Plot','Color','w','Tag','MatSurv KM-Plot figure');
     
     %Create Axes
-    if options.NoRiskTable || options.RT_InKM_Plot
+    if options.NoRiskTable || options.RT_KMplot
         axh_KM = axes(fh,'NextPlot','add','tag','KM-Plot');
     else
         axh_KM = axes(fh,'Position',options.KM_position,'NextPlot','add','tag','KM-Plot');
