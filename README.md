@@ -307,6 +307,10 @@ KM plot options
   to base font size. (Default: 0)
 
 Risk table plot options
+
+*`RT_KMplot`: A true/false value which, if true, the risk table is placed
+  as a part of the KM-plot. (default: False)
+
 * `RT_XAxis`: A true/false value which, if true, a X-axis line is
   included in the risk table. (default: True)
 
