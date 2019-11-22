@@ -18,7 +18,7 @@ The general usage is:
 
 
 ## Why Matsurv ##
-MatSurv allows MATLAB users to create KM-plots with a risk table and also to perform a log-rank test between two or more groups. MatSurv also provides a fine grained customization of the KM-plots, making it suitiable for publications. MatSurv hopefully will make the life easier for fellow Bioinformaticians (and other professionals) who prefer MATLAB over R. 
+MatSurv allows MATLAB users to create KM-plots with a risk table and also to perform a log-rank test between two or more groups. An event is, for example, death, relapse of disease, or a new metastatic tumor. If none of these events occur during the study period, the time-to-event is unknown, this point is called censored.  A risk table describe the number of patients that are still “at-risk” at a specific timepoint. MatSurv also provides a fine grained customization of the KM-plots, making it suitiable for publications. MatSurv hopefully will make the life easier for fellow Bioinformaticians (and other professionals) who prefer MATLAB over R. 
 ## Citing MatSurv ##
 
 Under review in JOSS
