@@ -452,7 +452,7 @@ else % Creat KM-Plot
         axh_KM.XLim = [0 options.XLim];
     end
     
-    if options.RT_InKM_Plot
+    if options.RT_KMplot
         axh_KM.XLim(1) = axh_KM.XLim(1) - ((axh_KM.XLim(2)-  axh_KM.XLim(1))/20);
     end
     
@@ -518,7 +518,7 @@ else % Creat KM-Plot
             cMAP_RT = repmat(cMAP_RT,DATA.numGroups,1);
         end
         
-        if options.RT_InKM_Plot
+        if options.RT_KMplot
             
             % extend YLim for KM-plot
             axh_KM.YLim(1) =  axh_KM.YLim(1) - 0.05 - 0.05*DATA.numGroups;
@@ -553,7 +553,7 @@ else % Creat KM-Plot
             axh_RT.XAxis.FontSize=options.BaseFontSize + options.XTickFontSize;
             
             % Create RT graph for text
-            axh_RT.YLim = [0.1 DATA.numGroups + 0.1];
+            axh_RT.YLim = [0.5 DATA.numGroups + 0.5];
             axh_RT.YTick = 1:DATA.numGroups;
             linkaxes([axh_RT,axh_KM],'x')
             
@@ -592,7 +592,7 @@ else % Creat KM-Plot
             % Title
             if ~isempty(options.RT_Title)
                 ht = title(axh_RT,options.RT_Title,'FontSize',14,options.TitleOptions{:});
-                ht.VerticalAlignment='middle';
+                ht.VerticalAlignment='bottom';
             end
         end
     end
@@ -651,7 +651,7 @@ p.addParameter('MedianLess',1);
 
 % Figure Options
 p.addParameter('KM_position',[0.25 0.40 0.70 0.45]);
-p.addParameter('RT_position',[0.25 0.07 0.70 0.18]);
+p.addParameter('RT_position',[0.25 0.07 0.70 0.17]);
 p.addParameter('BaseFontSize',16);
 
 
