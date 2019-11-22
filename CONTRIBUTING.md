@@ -1,0 +1,5 @@
+# How to contribute
+
+ - **Questions**: If you have a question on the use of MatSurv,  please first look through the documentation and the examples shown. If not found then take a look at [closed issues](https://github.com/aebergl/MatSurv/issues?q=is%3Aissue+is%3Aclosed) on GitHub. Finally, if you can not find an answer there, do not hesitate to create a new [issue](https://github.com/aebergl/MatSurv/issues) with your question: they act as a sort of FAQ.
+ - **Bugs**: Known bugs are left as [open issues](https://github.com/aebergl/MatSurv/issues) on GitHub, if you find a new one, please report it there and include a minimal working example demonstrating how the gramm results differ from what is expected.
+ - **Modifications**: Changing the functionality of MatSurv may require some discussions on the functionality of MatSurv. For discussion create a new issue or if your modifications are ready just submit a pull request. I will review the code and functionality and eventually discuss/make changes to your commit before merging when it is working satisfactorily.
