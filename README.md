@@ -168,9 +168,9 @@ load laml_HGF_gene_data.mat
 
 * `CutPoint`: Either a string or scalar/vector with cut points to be used
   for defining groups based on a continuous `GroupVar` input variable
-  Allowed names are: 'Median' or 'Quartile'
+  Allowed names are: 'Median', 'Quartile' or 'Tertile'
   If a scalar or vector is given, the groups will be defined based on the
-  cut points. (default: 'median')
+  cut points. (default: 'Median')
 
 * `GroupsToUse`: Cell array defining what groups to use from the `GroupVar`
   variable. Only works if `GroupVar` is a cell array. (default: all groups are used)
