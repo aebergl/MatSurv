@@ -63,7 +63,7 @@ INPUTS:
   'EventDefinition' can be used to define other types of events. 
 
 * `GroupVar` is a vector or cell array defining the different groups.
-  If `GroupVar` is a continuous variable, median cut will be used as a default.
+   if `GroupVar` is a numeric vector, median-cut will be used as a default.
 
 OUTPUTS:
 
@@ -175,8 +175,10 @@ load laml_HGF_gene_data.mat
 * `GroupsToUse`: Cell array defining what groups to use from the `GroupVar`
   variable. Only works if `GroupVar` is a cell array. (default: all groups are used)
 
-* `GroupOrder`: A cell array defining the group order to be used in the
-  legend. (default: Groups are sorted alphabetically)
+* `GroupOrder`: A cell array or vector defining the group order to be used in the
+   legend. The vector needs to have the same number of elements as groups 
+   while the cell array does not have that requirement. 
+   (default: Groups are sorthed by `GroupsToUse` if defined, else alphabetically)
 
 * `EventDefinition`: Two element cell array where the first cell defines
   the event and the second defines censored values. Example {'Dead,'Alive'}
