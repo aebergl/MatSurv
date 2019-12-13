@@ -1,5 +1,5 @@
 # MatSurv [![View MatSurv on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://www.mathworks.com/matlabcentral/fileexchange/64582-matsurv)
-MatSurv is a simple survival analysis function for MATLAB that creates a KM plot with risk table. Survival statistics, such as log-rank p-value and hazard ratio (HR) are also calculated. The log-rank test has been evaluated to give the same results as SAS and R. The style of the KM plot is easily changed with input parameters. No additional toolboxes are needed or depended upon. MatSurv was inspired by the [survminer R-package](https://github.com/kassambara/survminer).
+MatSurv is a simple survival analysis function for MATLAB (version 2016b and later) that creates a KM plot with risk table. Survival statistics, such as log-rank p-value and hazard ratio (HR) are also calculated. The log-rank test has been evaluated to give the same results as SAS and R. The style of the KM plot is easily changed with input parameters. No additional toolboxes are needed or depended upon. MatSurv was inspired by the [survminer R-package](https://github.com/kassambara/survminer).
 
 
 
