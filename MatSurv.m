@@ -937,7 +937,13 @@ elseif (strcmpi('Median',options.CutPoint) || isscalar(options.CutPoint)) && isn
     DATA.GROUPS(2).EventVar = EventVarBin(indx_Below);
     
 elseif strcmpi('Quartile',options.CutPoint)  && isnumeric(GroupVar)
-    Cut_Val = prctile(GroupVar,[25 75]);
+    if license('test','statistics_toolbox')
+        Cut_Val = prctile(GroupVar,[25 75]);
+    else
+        Cut_Val = zeros(2,1);
+        Cut_Val(1) = interp1(linspace(0.5/length(GroupVar), 1-0.5/length(GroupVar), length(GroupVar))', sort(GroupVar), 25*0.01, 'linear');
+        Cut_Val(2) = interp1(linspace(0.5/length(GroupVar), 1-0.5/length(GroupVar), length(GroupVar))', sort(GroupVar), 75*0.01, 'linear');
+    end
     DATA.GroupType = 'Quartile';
     indx_Below  = (GroupVar < Cut_Val(1));
     indx_Above = (GroupVar > Cut_Val(2));
@@ -950,7 +956,13 @@ elseif strcmpi('Quartile',options.CutPoint)  && isnumeric(GroupVar)
     DATA.GROUPS(2).EventVar = EventVarBin(indx_Below);
     
 elseif strcmpi('Tertile',options.CutPoint)  && isnumeric(GroupVar)
-    Cut_Val = prctile(GroupVar,[100/3 100/1.5]);
+    if license('test','statistics_toolbox')
+         Cut_Val = prctile(GroupVar,[100/3 100/1.5]);
+    else
+        Cut_Val = zeros(2,1);
+        Cut_Val(1) = interp1(linspace(0.5/length(GroupVar), 1-0.5/length(GroupVar), length(GroupVar))', sort(GroupVar), 100/3*0.01, 'linear');
+        Cut_Val(2) = interp1(linspace(0.5/length(GroupVar), 1-0.5/length(GroupVar), length(GroupVar))', sort(GroupVar), 100/1.5*0.01, 'linear');
+    end
     DATA.GroupType = 'Tertile';
     indx_Below  = (GroupVar < Cut_Val(1));
     indx_Above = (GroupVar > Cut_Val(2));
