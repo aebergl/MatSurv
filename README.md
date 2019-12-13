@@ -23,6 +23,10 @@ MatSurv allows MATLAB users to create KM-plots with a risk table and also to per
 
 Under review in JOSS
 
+## MATLAB Release Compatibility ##
+
+Compatible with R2016b to R2019b
+
 ## Simple Example ##
 
 The following code loads the data from "Freireich, EJ et al. 1963, Blood, 21, 699-716)" and creates a KM plot with risk table. The time unit is weeks and the x-axis step length is changed to 4. The risk table shows how many are at risk (alive) for each time point. Censored points are marked with a vertical line. 
