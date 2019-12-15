@@ -59,11 +59,13 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 %   cut points. (default: 'Median')
 %
 % * 'GroupsToUse': Cell array defining what groups to use from the GroupVar
-%   variable. Works only if GroupVar is a cell array. (default: all groups are used)
+%   variable. Groups can be merged using a multilevel cell structure, for example:
+%   {{'Group 1+2','Group1','Group2'},'Group3','Group4'} Group 1 & 2 will be
+%   merged and called Group 1+2 (default: all groups are used)
 %
 % * 'GroupOrder': A cell array or vector defining the group order to be used in the
-%   legend. The vector needs to have the same number of elements as groups 
-%   while the cell array does not have that requirement. 
+%   legend. The vector needs to have the same number of elements as groups
+%   while the cell array does not have that requirement.
 %   (default: Groups are sorthed by 'GroupToUse' if defined, else alphabetically)
 %
 % * 'EventDefinition': Two element cell array where the first cell defines
@@ -71,6 +73,9 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 %
 % * 'TimeMin': Scalar defining minimum valid time point. Subjects with time
 %   values below this will be removed. (default: 0)
+%
+% * 'MinNumSamples': Scalar defining minimum number of samples for a Group
+%   Groups with less samples will be removed. (default: 0)
 %
 % * 'TimeMax': Scalar value defining right censoring time. Subjects with
 %   TimeVar > TimeMax will be set to TimeMax and considered as censored.
@@ -287,6 +292,10 @@ end
 % CreatGroups based on GroupVar and create DATA structure
 [DATA,options] = MatSurvCreateGroups(TimeVar, EventVarBin, GroupVar, options);
 
+% Check if there is enough samples in each group and if there is more than
+% one group with no events
+[DATA, options] = MatSurvCheckGroups(DATA, options);
+
 % Flip Group Ordering
 if options.FlipGroupOrder
     DATA.GROUPS = DATA.GROUPS(DATA.numGroups:-1:1);
@@ -311,8 +320,12 @@ end
 [DATA] = MatSurvCreateTable(DATA);
 
 % Do log rank test
-[p,stats] = MatSurvLogRank(DATA);
-
+if options.CalcP
+    [p,stats] = MatSurvLogRank(DATA);
+else
+    p=[];
+    stats=[];
+end
 if options.PairWiseP
     counter = 0;
     stats.ParwiseName = cell(DATA.numGroups * (DATA.numGroups - 1) / 2,1);
@@ -483,7 +496,7 @@ else % Creat KM-Plot
     axh_KM.XAxis.MinorTickValues = XMinorStep:XMinorStep:axh_KM.XTick(end);
     axh_KM.LineWidth = 1.5;
     
-    if options.DispP
+    if options.CalcP && options.DispP
         txt_str(1) = {sprintf('p = %.3g',p)};
         if options.DispHR && isfield(stats,'HR_logrank')
             if ~options.Use_HR_MH
@@ -610,7 +623,7 @@ else % Creat KM-Plot
     end
 end
 
-if options.Print
+if options.CalcP && options.Print
     fprintf('\n')
     fprintf('p = %.3g\n',stats.p_MC)
     if options.CalcHR && isfield(stats,'HR_logrank')
@@ -651,6 +664,7 @@ p.addParameter('CutPoint','Median');
 p.addParameter('GroupOrder',[]);
 p.addParameter('GroupsToUse',[]);
 p.addParameter('EventDefinition',[]);
+p.addParameter('MinNumSamples',2);
 p.addParameter('TimeMin',0, @(x)isnumeric(x) && isscalar(x));
 p.addParameter('TimeMax',[], @(x)isnumeric(x) && isscalar(x));
 p.addParameter('FlipGroupOrder',0);
@@ -716,7 +730,7 @@ p.addParameter('RTtitleAlignment','center')
 
 %Others
 p.addParameter('CalcHR',1);
-
+p.addParameter('CalcP',1);
 
 parse(p,varargin{:});
 params = p.Results;
@@ -764,6 +778,7 @@ Var_OE=zeros(n,DATA.numGroups-1);
 for i = 1:DATA.numGroups-1
     Var_OE(:,i) = (nf(:,i) .* (nf_sum - nf(:,i)) .* mf_sum .*(nf_sum - mf_sum)) ./ (nf_sum.^2 .* (nf_sum - 1));
 end
+
 Var_OE(isnan(Var_OE)) = 0;
 Var_OE_sum = sum(Var_OE);
 
@@ -777,6 +792,7 @@ if DATA.numGroups > 2 % If there are more than 2 groups
             Cov_OE(:,counter) = ( -nf(:,i) .* nf(:,j) .* mf_sum .* (nf_sum - mf_sum)) ./ (nf_sum.^2 .* (nf_sum -1));
         end
     end
+    
     Cov_OE(isnan(Cov_OE)) = 0;
     Cov_OE_sum = sum(Cov_OE);
     V = zeros(DATA.numGroups-1);
@@ -790,6 +806,7 @@ end
 
 % Mantel Cox
 %Calculate Chi2
+
 Chi2 = d'/V*d;
 
 %p = 1 - gammainc(stats.Chi2/2,(DATA.numGroups-1)/2);
@@ -875,6 +892,50 @@ Censored_Points=[tf(indx_censored) S(indx_censored)];
 
 end
 
+function [DATA,options] = MatSurvCheckGroups(DATA,options)
+% Error check on the groups
+
+% Make sure that each groups has enough samples
+numSamples = arrayfun(@(x) length(x.EventVar), DATA.GROUPS);
+indx_rem =  numSamples < options.MinNumSamples;
+indx_rem = find(indx_rem);
+if ~isempty(indx_rem)
+    if ~options.NoWarnings
+        fprintf('\n'); 
+        fprintf('*********************************\n');  
+        for i=1:length(indx_rem)
+            fprintf('Group %s (n=%u) has been removed due to less than %u samples\n',DATA.GROUPS(indx_rem(i)).GroupName{1},numSamples(indx_rem(i)), options.MinNumSamples );
+        end
+        fprintf('*********************************\n');
+        fprintf('\n');
+    end
+end
+DATA.GROUPS(indx_rem) = [];
+DATA.numGroups = DATA.numGroups - length(indx_rem);
+
+% Make sure that there is not more than one Group with ZERO events
+nGroupsNoEvents = find(arrayfun(@(x) sum(x.EventVar), DATA.GROUPS) == 0);
+if length(nGroupsNoEvents) > 1
+    options.CalcP = 0;
+    if ~options.NoWarnings
+        fprintf('\n'); 
+        fprintf('*********************************\n');
+        fprintf('Warning! logrank will not calculated since there are %u Groups with no events\n',length(nGroupsNoEvents) );
+        fprintf('The Groups are: ')
+        for i=1:length(nGroupsNoEvents)-1
+            fprintf('%s, ',DATA.GROUPS(nGroupsNoEvents(i)).GroupName{1});           
+        end
+        i = i + 1;
+        fprintf('%s\n',DATA.GROUPS(nGroupsNoEvents(i)).GroupName{1})
+        fprintf('Please remove or merge groups\n')
+        fprintf('*********************************\n');
+        fprintf('\n'); 
+    end
+end
+
+
+end
+
 function [DATA,options] = MatSurvCreateGroups(TimeVar, EventVarBin, GroupVar, options)
 % Create Group structure
 DATA.numGroups = 0;
@@ -886,8 +947,16 @@ if ~isempty(options.GroupsToUse) % User defined Groups to use
     DATA.GroupType = 'Groups';
     for i = 1:DATA.numGroups
         if iscell(GroupVar)
-            indx_group = strcmp(options.GroupsToUse(i),GroupVar);
-            DATA.GROUPS(i).GroupName = options.GroupsToUse(i);
+            tmp_group = options.GroupsToUse{i};
+            if ~iscell(tmp_group)
+                tmp_group = {tmp_group};
+            end
+            indx_group = false(length(GroupVar),numel(tmp_group));
+            for j=1:length(tmp_group)
+                indx_group(:,j) = strcmp(tmp_group{j},GroupVar);
+            end
+            indx_group = any(indx_group,2);
+            DATA.GROUPS(i).GroupName = tmp_group(1);
         elseif isnumeric(GroupVar)
             indx_group = (options.GroupsToUse(i) == GroupVar);
             DATA.GROUPS(i).GroupName = {num2str(options.GroupsToUse(i))};
@@ -957,7 +1026,7 @@ elseif strcmpi('Quartile',options.CutPoint)  && isnumeric(GroupVar)
     
 elseif strcmpi('Tertile',options.CutPoint)  && isnumeric(GroupVar)
     if license('test','statistics_toolbox')
-         Cut_Val = prctile(GroupVar,[100/3 100/1.5]);
+        Cut_Val = prctile(GroupVar,[100/3 100/1.5]);
     else
         Cut_Val = zeros(2,1);
         Cut_Val(1) = interp1(linspace(0.5/length(GroupVar), 1-0.5/length(GroupVar), length(GroupVar))', sort(GroupVar), 100/3*0.01, 'linear');
@@ -1005,12 +1074,6 @@ elseif (isvector(options.CutPoint)) && isnumeric(GroupVar)
     DATA.GROUPS(i+1).TimeVar = TimeVar(indx);
     DATA.GROUPS(i+1).EventVar = EventVarBin(indx);
 end
-
-% %Hazard ration can only be calculated if there is two groups
-% if DATA.numGroups ~= 2
-%     options.DispHR = 0;
-%     options.CalcHR = 0;
-% end
 
 end
 
