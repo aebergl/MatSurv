@@ -677,7 +677,7 @@ p.addParameter('MedianLess',1);
 
 % Figure Options
 p.addParameter('KM_position',[0.25 0.40 0.70 0.45]);
-p.addParameter('RT_position',[0.25 0.07 0.70 0.17]);
+p.addParameter('RT_position',[0.25 0.06 0.70 0.19]);
 p.addParameter('BaseFontSize',16);
 
 
