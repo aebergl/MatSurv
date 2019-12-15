@@ -75,7 +75,7 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 %   values below this will be removed. (default: 0)
 %
 % * 'MinNumSamples': Scalar defining minimum number of samples for a Group
-%   Groups with less samples will be removed. (default: 0)
+%   Groups with less samples will be removed. (default: 2)
 %
 % * 'TimeMax': Scalar value defining right censoring time. Subjects with
 %   TimeVar > TimeMax will be set to TimeMax and considered as censored.
