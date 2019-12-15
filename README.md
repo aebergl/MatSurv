@@ -177,7 +177,9 @@ load laml_HGF_gene_data.mat
   cut points. (default: 'Median')
 
 * `GroupsToUse`: Cell array defining what groups to use from the `GroupVar`
-  variable. Only works if `GroupVar` is a cell array. (default: all groups are used)
+   variable. Groups can be merged using a multilevel cell structure, for example:
+   {{'Group 1+2','Group1','Group2'},'Group3','Group4'} Group 1 & 2 will be
+   merged and called Group 1+2 (default: all groups are used)
 
 * `GroupOrder`: A cell array or vector defining the group order to be used in the
    legend. The vector needs to have the same number of elements as groups 
@@ -189,6 +191,9 @@ load laml_HGF_gene_data.mat
 
 * `TimeMin`: Scalar defining minimum valid time point. Subjects with time
   values below this will be removed. (default: 0)
+  
+* `MinNumSamples`: Scalar defining minimum number of samples for a Group
+   Groups with less samples will be removed. (default: 2)
 
 * `TimeMax`: Scalar value defining right censoring time. Subjects with
   `TimeVar` > `TimeMax` will be set to `TimeMax` and considered as censored.
