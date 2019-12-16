@@ -479,11 +479,9 @@ else % Creat KM-Plot
     
     if options.RT_KMplot
         axh_KM.XLim(1) = axh_KM.XLim(1) - ((axh_KM.XLim(2)-  axh_KM.XLim(1))/20);
-    end
-    
+    end    
     max_X = axh_KM.XLim(2);
     Nudge_X = max_X / 50;
-    
     
     if ~isempty(options.Xstep)
         axh_KM.XTick = 0:options.Xstep:max_X;
@@ -569,9 +567,7 @@ else % Creat KM-Plot
                         'FontSize',options.BaseFontSize + options.RT_FontSize,'Color',cMAP_RT(j,:),'FontWeight','bold')
                 end
             end
-            
-            
-            
+                        
         else
             axh_RT.LineWidth = 1.5;
             axh_RT.XTick=axh_KM.XTick;
@@ -581,8 +577,7 @@ else % Creat KM-Plot
             axh_RT.YLim = [0.5 DATA.numGroups + 0.5];
             axh_RT.YTick = 1:DATA.numGroups;
             linkaxes([axh_RT,axh_KM],'x')
-            
-            
+                      
             for i = 1:length(axh_KM.XTick)
                 for j = 1:DATA.numGroups
                     
