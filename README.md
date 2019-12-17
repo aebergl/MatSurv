@@ -11,14 +11,18 @@ The general usage is:
 ## Table of contents ##
 - [Why MatSurv](#Why-MatSurv)
 - [Citing MatSurv](#Citing-MatSurv)
+- [MATLAB Release Compatibility](#MATLAB-Release-Compatibility)
 - [Simple Example](#Simple-Example)
 - [Using MatSurv](#Using-Matsurv)
 - [More Examples](#More-Examples)
+- [Unit Test](#Unit-Test)
 - [List of all input options](#List-of-all-input-options)
 
 
 ## Why Matsurv ##
-MatSurv allows MATLAB users to create KM-plots with a risk table and also to perform a log-rank test between two or more groups. An event is, for example, death, relapse of disease, or a new metastatic tumor. If none of these events occur during the study period, the time-to-event is unknown, this point is called censored.  A risk table describe the number of patients that are still “at-risk” at a specific timepoint. MatSurv also provides a fine grained customization of the KM-plots, making it suitiable for publications. MatSurv hopefully will make the life easier for fellow Bioinformaticians (and other professionals) who prefer MATLAB over R. 
+MatSurv allows MATLAB users to create KM-plots with a risk table and also to perform a log-rank test between two or more groups. An event is, for example, death, relapse of disease, or a new metastatic tumor. If none of these events occur during the study period, the time-to-event is unknown, this point is called censored.  A risk table describe the number of patients that are still “at-risk” at a specific timepoint. MatSurv also provides a fine grained customization of the KM-plots, making it suitiable for publications. MatSurv hopefully will make the life easier for fellow Bioinformaticians (and other professionals) who prefer MATLAB over R.
+
+
 ## Citing MatSurv ##
 
 Under review in JOSS
@@ -172,7 +176,9 @@ load laml_HGF_gene_data.mat
 
 <img src="/figures/laml_HGF_gene_TwoCutPoints.png" alt="Two Cut points MatSurv example" width="600">
 
+## Unit Test ##
 
+A test script for MatSurv can be found in the UnitTest directory.
 
 
 ## List of all input options ##
