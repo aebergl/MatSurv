@@ -123,6 +123,19 @@ load laml_RC_data.mat
 [p,fh,stats]=MatSurv(laml_RC_TimeVar, laml_RC_EventVar,  laml_RC_GroupVar,...
 'GroupsToUse', {'Good','Intermediate','Poor'},'Xstep',24);
 ```
+<img src="/figures/laml_Risk_Cyto_Merged.png" alt="Multiple groups MatSurv example" width="600">
+
+### Example with merging groups ###
+
+Groups can be merged using a multilevel cell as GroupToUse input
+This example will merge the poor and N.D group. The first element in the cell array will definie the name of the merged group and cain either be the name of an existing group ar a new group name.
+
+```matlab
+load laml_RC_data.mat
+
+[p,fh,stats]=MatSurv(laml_RC_TimeVar, laml_RC_EventVar,  laml_RC_GroupVar,...
+'GroupsToUse', {'Good','Intermediate',{'Poor + N.D.','Poor','N.D.'}},'Xstep',24);
+```
 <img src="/figures/laml_Risk_Cyto.png" alt="Multiple groups MatSurv example" width="600">
 
 ### Example with gene expression data ###
@@ -137,10 +150,12 @@ load laml_HGF_gene_data.mat
 [p,fh,stats]=MatSurv(laml_HGF_gene_TimeVar,laml_HGF_gene_EventVar,HGF_gene,'Xstep',12,'InvHR',1);
 
 % Using quartile
-[p,fh,stats]=MatSurv(laml_HGF_gene_TimeVar,laml_HGF_gene_EventVar,HGF_gene,'Xstep',12,'InvHR',1,'CutPoint','quartile');
+[p,fh,stats]=MatSurv(laml_HGF_gene_TimeVar,laml_HGF_gene_EventVar,HGF_gene,'Xstep',12,'InvHR',1,...
+                     'CutPoint','quartile');
 
 % Using Two Cut points
-[p,fh,stats]=MatSurv(laml_HGF_gene_TimeVar,laml_HGF_gene_EventVar,HGF_gene,'Xstep',12,'InvHR',1,'CutPoint',[6 12]);
+[p,fh,stats]=MatSurv(laml_HGF_gene_TimeVar,laml_HGF_gene_EventVar,HGF_gene,'Xstep',12,'InvHR',1,...
+                    'CutPoint',[6 12]);
 
 ```
 #### Median cut ####
@@ -156,8 +171,6 @@ load laml_HGF_gene_data.mat
 #### Two cut points ####
 
 <img src="/figures/laml_HGF_gene_TwoCutPoints.png" alt="Two Cut points MatSurv example" width="600">
-
-
 
 
 
