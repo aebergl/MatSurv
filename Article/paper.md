@@ -39,13 +39,15 @@ estimate of survival probability at a given time; log-rank tests are
 used to conduct statistical inference on survival durations between
 groups; and HRs provide a ratio of the hazard rates between groups. 
 To further improve the KM-plot, it has been suggested that the KM-plot
-always should be accomplished by a table that describe the number of
+always should be accomplished by a table that describes the number of
 patients that are still “at-risk” at a specific timepoint (Morris 2019). 
-MATLAB (MATLAB 2018A) currently lacks functions to easily create
+MATLAB (MATLAB 2019B) currently lacks functions to easily create
 KM-plots with accompanying risk tables. Furthermore, MATLAB does not
 have a built-in log-rank test, nor is one available in any of the
 existing toolboxes, including the Statistics and Machine Learning
-Toolbox. Our goal for MatSurv is to provide an easy-to-use tool that
+Toolbox. The Statistics and Machine Learning Toolbox support Cox proportional
+hazards regression using the *coxphfit* function and KM-plots can be created using
+the *plot* or *stairs* functions. Our goal for MatSurv is to provide an easy-to-use tool that
 creates publication quality KM-plots with corresponding risk tables. The
 statistical procedures built into MatSurv can be used to compare two or
 multiple groups. In addition, MatSurv allows the user to easily modify
