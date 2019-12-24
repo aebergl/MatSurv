@@ -127,7 +127,7 @@ load laml_RC_data.mat
 [p,fh,stats]=MatSurv(laml_RC_TimeVar, laml_RC_EventVar,  laml_RC_GroupVar,...
 'GroupsToUse', {'Good','Intermediate','Poor'},'Xstep',24);
 ```
-<img src="/figures/laml_Risk_Cyto_Merged.png" alt="Multiple groups MatSurv example" width="600">
+<img src="/figures/laml_Risk_Cyto.png" alt="Multiple groups MatSurv example" width="600">
 
 ### Example with merging groups ###
 
@@ -140,7 +140,8 @@ load laml_RC_data.mat
 [p,fh,stats]=MatSurv(laml_RC_TimeVar, laml_RC_EventVar,  laml_RC_GroupVar,...
 'GroupsToUse', {'Good','Intermediate',{'Poor + N.D.','Poor','N.D.'}},'Xstep',24);
 ```
-<img src="/figures/laml_Risk_Cyto.png" alt="Multiple groups MatSurv example" width="600">
+<img src="/figures/laml_Risk_Cyto_Merged.png" alt="Multiple merged groups MatSurv example" width="600">
+
 
 ### Example with gene expression data ###
 
