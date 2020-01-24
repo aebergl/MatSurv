@@ -5,7 +5,7 @@ MatSurv is a simple survival analysis function for MATLAB (version 2016b and lat
 
 The general usage is:
 ```matlab
-[p, fh, stats] = MatSurv(TimeVar, EventVar, GroupVar,'param', value, …)
+[p, fh, stats] = MatSurv(TimeVar, EventVar, GroupVar, 'param', value, …)
 ```
 
 ## Table of contents ##
@@ -132,7 +132,7 @@ load laml_RC_data.mat
 ### Example with merging groups ###
 
 Groups can be merged using a multilevel cell as GroupToUse input
-This example will merge the poor and N.D group. The first element in the cell array will definie the name of the merged group and cain either be the name of an existing group ar a new group name.
+This example will merge the poor and N.D group. The first element in the cell array will define the name of the merged group and can either be the name of an existing group or a new group name.
 
 ```matlab
 load laml_RC_data.mat
@@ -145,7 +145,7 @@ load laml_RC_data.mat
 
 ### Example with gene expression data ###
 
-This example is also taken from the TCGA LAML dataset but we in this example we will be using RNAseq gene expression data for the hepatocyte growth factor (HGF) gene. HGF gene expression has been related to outcome in a variety of cancers, including of the lungs, pancreas, thyroid, colon, and breast. Obtaining the data from cBioPortal can be found in the MatSurv/Article/MATLAB/get_laml_HGF_gene_data.m script. The expression level of a gene is continues and if no prior knowledge is available, the median is frequqently used to divide the samples into two groups, see the first graph below. Using the top 25% and bottom 25%, quartiles, is also frequqntly used, see the second graph below. Finally, if one or several cut-points level are known, these can also be used, third graph below. 
+This example is also taken from the TCGA LAML dataset but we in this example we will be using RNAseq gene expression data for the hepatocyte growth factor (HGF) gene. HGF gene expression has been related to outcome in a variety of cancers, including of the lungs, pancreas, thyroid, colon, and breast. Obtaining the data from cBioPortal can be found in the MatSurv/Article/MATLAB/get_laml_HGF_gene_data.m script. The expression level of a gene is continues and if no prior knowledge is available, the median is frequqently used to divide the samples into two groups, see the first graph below. Using the top 25% and bottom 25%, quartiles, is also frequently used, see the second graph below. Finally, if one or several cut-points level are known, these can also be used, third graph below. 
 For this example we will load the data directly. 
 
 ```matlab
