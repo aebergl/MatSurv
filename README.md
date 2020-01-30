@@ -87,13 +87,13 @@ OUTPUTS:
                 p_MC: log rank p-value (Mantel-Cox) 
              Chi2_MC: Chi square (Mantel-Cox) 
           HR_logrank: Hazard Ratio (log rank)
-    HR_95_CI_logrank: 95% Confidence intervals [lower upper]
+    HR_95_CI_logrank: 95 percentile Confidence Intervals [lower upper]
       HR_logrank_Inv: Inverted Hazard Ratio (log rank)
-HR_95_CI_logrank_Inv: Inverted 95% Confidence intervals [lower upper]
+HR_95_CI_logrank_Inv: Inverted 95 percentile Confidence Intervals [lower upper]
                HR_MH: Hazard Ratio (Mantel-Haenszel)
-         HR_95_CI_MH: 95% Confidence intervals [lower upper]
+         HR_95_CI_MH: 95 percentile Confidence Intervals [lower upper]
            HR_MH_Inv: Inverted Hazard Ratio (Mantel-Haenszel)
-     HR_95_CI_MH_Inv: Inverted 95% Confidence intervals [lower upper]
+     HR_95_CI_MH_Inv: Inverted 95 percentile Confidence Intervals [lower upper]
   MedianSurvivalTime: Median survival time for each group
   
 ```
