@@ -11,7 +11,7 @@ authors:
   - name: Anders E Berglund
     affiliation: 1
 affiliations: 
-  - name: Moffitt Cancer Center, Tampa, FL
+  - name: Moffitt Cancer Center, Tampa, Florida, United States
     index: 1
 date: 14 October 2019
 bibliography: paper.bib
@@ -28,7 +28,7 @@ frequently include censored data points, samples where no event was observed.
 An event is, for example, death, relapse of disease, or a new metastatic tumor.
 If none of these events occur during the study period, the time to-to-event is
 unknown, we only know that no events were observed during the study time.
-The methods described below was developed for this kind of data.  For an
+The methods described below were developed for this kind of data.  For an
 in-depth introduction to survival analysis, we can recommend the book by
 Kleinbaum and David (Kleinbaum 1998). In fact, much of the code used in MatSurv is
 based on the equations given in the book. Commonly 
@@ -39,7 +39,7 @@ estimate of survival probability at a given time; log-rank tests are
 used to conduct statistical inference on survival durations between
 groups; and HRs provide a ratio of the hazard rates between groups. 
 To further improve the KM-plot, it has been suggested that the KM-plot
-always should be accomplished by a table that describes the number of
+should always be accomplished by a table that describes the number of
 patients that are still “at-risk” at a specific timepoint (Morris 2019). 
 MATLAB (MATLAB 2019B) currently lacks functions to easily create
 KM-plots with accompanying risk tables. Furthermore, MATLAB does not
