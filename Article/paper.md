@@ -41,7 +41,7 @@ groups; and HRs provide a ratio of the hazard rates between groups.
 To further improve the KM-plot, it has been suggested that the KM-plot
 should always be accomplished by a table that describes the number of
 patients that are still “at-risk” at a specific timepoint [@morris2019]. 
-MATLAB [as of version MATLAB 2019B] currently lacks functions to easily create
+MATLAB [@MATLAB:2019] currently lacks functions to easily create
 KM-plots with accompanying risk tables. Furthermore, MATLAB does not
 have a built-in log-rank test, nor is one available in any of the
 existing toolboxes, including the Statistics and Machine Learning
