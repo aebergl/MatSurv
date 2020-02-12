@@ -151,7 +151,7 @@ load laml_RC_data.mat
 'LineColor',[0.2667,0.3373,0.5804;0.6353,0.2275,0.1804;0.0039,0.4000,0.3686]);
 ```
 
-![Output for Survminer (A), SAS (B) and MatSurv (C). All three produce the same log-rank p-value of 4.02E-6](figure_20191226.png)
+![Output for Survminer (A), SAS (B) and MatSurv (C). All three produce the same log-rank p-value of 4.02E-6](figure_20191226.png =250x)
 
 The results from MatSurv have been compared against both SAS and R and
 found to return similar estimates. The Chi-Sq values and p-values for a
