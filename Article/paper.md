@@ -30,7 +30,7 @@ If none of these events occur during the study period, the time to-to-event is
 unknown, we only know that no events were observed during the study time.
 The methods described below were developed for this kind of data.  For an
 in-depth introduction to survival analysis, we can recommend the book by
-Kleinbaum and David (Kleinbaum 1998). In fact, much of the code used in MatSurv is
+Kleinbaum and David [@Kleinbaum1998]. In fact, much of the code used in MatSurv is
 based on the equations given in the book. Commonly 
 reported elements of survival analysis include log-rank tests, hazard
 ratios (HR) and Kaplan-Meier (KM) curves. KM-curves are used to compare
@@ -40,7 +40,7 @@ used to conduct statistical inference on survival durations between
 groups; and HRs provide a ratio of the hazard rates between groups. 
 To further improve the KM-plot, it has been suggested that the KM-plot
 should always be accomplished by a table that describes the number of
-patients that are still “at-risk” at a specific timepoint (Morris 2019). 
+patients that are still “at-risk” at a specific timepoint [@morris2019]. 
 MATLAB [as of version MATLAB 2019B] currently lacks functions to easily create
 KM-plots with accompanying risk tables. Furthermore, MATLAB does not
 have a built-in log-rank test, nor is one available in any of the
@@ -52,7 +52,7 @@ creates publication quality KM-plots with corresponding risk tables. The
 statistical procedures built into MatSurv can be used to compare two or
 multiple groups. In addition, MatSurv allows the user to easily modify
 the appearance of the created figure. The graphics were inspired by the
-`survminer` R-package (Kassambara 2018).
+`survminer` R-package [@survminer].
 
 # MatSurv Use and Features
 
@@ -110,8 +110,8 @@ The MatSurv output is comparable to that from `proc lifetest` in SAS and
 `ggsurvplot` in R. Code for reproducing similar output in R and SAS are
 shown below as well as the output from all 3 statistical programs (R,
 SAS and MatSurv). The data used is from a classic and frequently used
-example by Freireich (Freireich 1963). In addition, we have also used
-the Acute Myeloid Leukemia (LAML) dataset (Ley 2013) from The Cancer
+example by Freireich [@freireich]. In addition, we have also used
+the Acute Myeloid Leukemia (LAML) dataset [@laml] from The Cancer
 Genome Atlas (TCGA). The following examples, use three different risk
 groups as well as the effect of HGF gene expression has on survival.
 
@@ -173,14 +173,3 @@ This work was supported in part by NCI Cancer Center Support Grant (P30-CA076292
 Patrick Leo, CCIPD, for contributing to this project.
 
 # References
-
-Kleinbaum, David G. "Survival analysis, a self‐learning text." *Biometrical Journal: Journal of Mathematical Methods in Biosciences* 40.1 (1998): 107-108.
-
-Morris TP, Jarvis CI, Cragg W, et al Proposals on Kaplan–Meier plots in medical research and a survey of stakeholder views: KMunicate *BMJ Open* 2019;9:e030215. doi: 10.1136/bmjopen-2019-030215
-
-Kassambara, A. 2018. “Survminer.” *GitHub Repository*.
-<https://github.com/kassambara/survminer>; GitHub.
-
-Acute Leukemia Group B, Freireich EJ, Gehan E, Frei E et al. The Effect of 6-Mercaptopurine on the Duration of Steroid-induced Remissions in Acute Leukemia: A Model for Evaluation of Other Potentially Useful Therapy. *Blood* 1963; 21 (6): 699–716. 
-
-Cancer Genome Atlas Research Network et al. “Genomic and epigenomic landscapes of adult de novo acute myeloid leukemia.” *The New England journal of medicine* vol. 368,22 (2013): 2059-74. doi:10.1056/NEJMoa1301689
