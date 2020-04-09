@@ -12,6 +12,7 @@ The general usage is:
 - [Why MatSurv](#Why-MatSurv)
 - [Citing MatSurv](#Citing-MatSurv)
 - [MATLAB Release Compatibility](#MATLAB-Release-Compatibility)
+- [Recent Improvements](#Recent-Improvements)
 - [Simple Example](#Simple-Example)
 - [Using MatSurv](#Using-Matsurv)
 - [More Examples](#More-Examples)
@@ -30,6 +31,10 @@ Creed et al., (2020). MatSurv: Survival analysis and visualization in MATLAB. Jo
 ## MATLAB Release Compatibility ##
 
 Compatible with R2016b to R2019b
+
+## Recent Improvements ##
+
+2020-04-08 : Added logrank test for trend, use `'LogRankTrend',true `
 
 ## Simple Example ##
 
@@ -218,6 +223,9 @@ A test script for MatSurv can be found in the UnitTest directory.
 * `TimeMax`: Scalar value defining right censoring time. Subjects with
   `TimeVar` > `TimeMax` will be set to `TimeMax` and considered as censored.
   (default: [])
+
+* `LogRankTrend`: A true/false for performing a log rank test for trend
+   requires equally spaced ordered groups (default: false)
 
 * `PairWiseP`: A true/false value for calculating pairwise log-rank test
   between group pairs; useful if there are more than two groups. (default: false)
