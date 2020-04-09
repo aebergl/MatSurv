@@ -338,7 +338,7 @@ if options.PairWiseP
             DATA_tmp.numGroups = 2;
             DATA_tmp.GROUPS(1) = DATA.GROUPS(i);
             DATA_tmp.GROUPS(2) = DATA.GROUPS(j);
-            [~,stats.ParwiseStats(counter)] = MatSurvLogRank(DATA_tmp);
+            [~,stats.ParwiseStats(counter)] = MatSurvLogRank(DATA_tmp,options);
             stats.ParwiseName{counter} = sprintf('%s vs. %s',DATA.GROUPS(i).GroupName{1},DATA.GROUPS(j).GroupName{1});
         end
     end
