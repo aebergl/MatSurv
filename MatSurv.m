@@ -81,6 +81,9 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 %   TimeVar > TimeMax will be set to TimeMax and considered as censored.
 %   (default: [])
 %
+% * 'LogRankTrend': A true/false for performing a log rank test for trend
+%    requires equally spaced ordered groups (default: false)
+%
 % * 'PairWiseP': A true/false for calculating pairwise log rank test
 %   between group pairs, useful if there are more than two groups. (default: false)
 %
@@ -321,7 +324,7 @@ end
 
 % Do log rank test
 if options.CalcP
-    [p,stats] = MatSurvLogRank(DATA);
+    [p,stats] = MatSurvLogRank(DATA,options);
 else
     p=[];
     stats=[];
@@ -479,7 +482,7 @@ else % Creat KM-Plot
     
     if options.RT_KMplot
         axh_KM.XLim(1) = axh_KM.XLim(1) - ((axh_KM.XLim(2)-  axh_KM.XLim(1))/20);
-    end    
+    end
     max_X = axh_KM.XLim(2);
     Nudge_X = max_X / 50;
     
@@ -495,7 +498,11 @@ else % Creat KM-Plot
     axh_KM.LineWidth = 1.5;
     
     if options.CalcP && options.DispP
-        txt_str(1) = {sprintf('p = %.3g',p)};
+        if options.LogRankTrend
+            txt_str(1) = {sprintf('p(trend) = %.3g',stats.p_MC_Trend)};
+        else
+            txt_str(1) = {sprintf('p = %.3g',p)};
+        end
         if options.DispHR && isfield(stats,'HR_logrank')
             if ~options.Use_HR_MH
                 if options.InvHR
@@ -567,7 +574,7 @@ else % Creat KM-Plot
                         'FontSize',options.BaseFontSize + options.RT_FontSize,'Color',cMAP_RT(j,:),'FontWeight','bold')
                 end
             end
-                        
+            
         else
             axh_RT.LineWidth = 1.5;
             axh_RT.XTick=axh_KM.XTick;
@@ -577,7 +584,7 @@ else % Creat KM-Plot
             axh_RT.YLim = [0.5 DATA.numGroups + 0.5];
             axh_RT.YTick = 1:DATA.numGroups;
             linkaxes([axh_RT,axh_KM],'x')
-                      
+            
             for i = 1:length(axh_KM.XTick)
                 for j = 1:DATA.numGroups
                     
@@ -666,6 +673,7 @@ p.addParameter('FlipGroupOrder',0);
 p.addParameter('FlipColorOrder',0);
 p.addParameter('NoWarnings',false);
 p.addParameter('TimeUnit','Months');
+p.addParameter('LogRankTrend',false);
 p.addParameter('PairWiseP',0);
 p.addParameter('Print',1);
 p.addParameter('MedianLess',1);
@@ -732,7 +740,7 @@ params = p.Results;
 
 end
 
-function [p,stats] = MatSurvLogRank(DATA)
+function [p,stats] = MatSurvLogRank(DATA,options)
 
 % Merge tables from all groups
 KM_ALL = vertcat(DATA.GROUPS.KM_Events);
@@ -826,6 +834,40 @@ if DATA.numGroups == 2
     stats.HR_95_CI_MH_Inv = flip(1 ./ stats.HR_95_CI_MH);
 end
 
+if options.LogRankTrend && DATA.numGroups > 2
+    % For the trend test one has to use all the groups
+    d = sum(mf(:,1:end)-ef(:,1:end))';
+    
+    %Calculate Variance
+    Var_OE=zeros(n,DATA.numGroups);
+    for i = 1:DATA.numGroups
+        Var_OE(:,i) = (nf(:,i) .* (nf_sum - nf(:,i)) .* mf_sum .*(nf_sum - mf_sum)) ./ (nf_sum.^2 .* (nf_sum - 1));
+    end
+    
+    Var_OE(isnan(Var_OE)) = 0;
+    Var_OE_sum = sum(Var_OE);
+    
+    %Calculate covariance
+    Cov_OE = zeros(n,(DATA.numGroups)*(DATA.numGroups-1)/2);
+    counter = 0;
+    for i = 1:DATA.numGroups-1
+        for j = i+1:DATA.numGroups
+            counter = counter + 1;
+            Cov_OE(:,counter) = ( -nf(:,i) .* nf(:,j) .* mf_sum .* (nf_sum - mf_sum)) ./ (nf_sum.^2 .* (nf_sum -1));
+        end
+    end
+    
+    Cov_OE(isnan(Cov_OE)) = 0;
+    Cov_OE_sum = sum(Cov_OE);
+    V = zeros(DATA.numGroups);
+    V(tril(true(DATA.numGroups),-1))=Cov_OE_sum;
+    V(~tril(true(DATA.numGroups),0))=Cov_OE_sum;
+    V(1:size(V,1)+1:end) = Var_OE_sum;
+    c = (1:DATA.numGroups)';
+    Chi2 = (c' * d)^2 / (c' * V * c);
+    stats.p_MC_Trend = gammainc(Chi2/2,(1)/2,'upper'); % DF is always 1;
+    stats.Chi2_MC_Trend = Chi2';
+end
 
 end
 
@@ -896,8 +938,8 @@ indx_rem =  numSamples < options.MinNumSamples;
 indx_rem = find(indx_rem);
 if ~isempty(indx_rem)
     if ~options.NoWarnings
-        fprintf('\n'); 
-        fprintf('*********************************\n');  
+        fprintf('\n');
+        fprintf('*********************************\n');
         for i=1:length(indx_rem)
             fprintf('Group %s (n=%u) has been removed due to less than %u samples\n',DATA.GROUPS(indx_rem(i)).GroupName{1},numSamples(indx_rem(i)), options.MinNumSamples );
         end
@@ -913,21 +955,26 @@ nGroupsNoEvents = find(arrayfun(@(x) sum(x.EventVar), DATA.GROUPS) == 0);
 if length(nGroupsNoEvents) > 1
     options.CalcP = 0;
     if ~options.NoWarnings
-        fprintf('\n'); 
+        fprintf('\n');
         fprintf('*********************************\n');
         fprintf('Warning! logrank will not calculated since there are %u Groups with no events\n',length(nGroupsNoEvents) );
         fprintf('The Groups are: ')
         for i=1:length(nGroupsNoEvents)-1
-            fprintf('%s, ',DATA.GROUPS(nGroupsNoEvents(i)).GroupName{1});           
+            fprintf('%s, ',DATA.GROUPS(nGroupsNoEvents(i)).GroupName{1});
         end
         i = i + 1;
         fprintf('%s\n',DATA.GROUPS(nGroupsNoEvents(i)).GroupName{1})
         fprintf('Please remove or merge groups\n')
         fprintf('*********************************\n');
-        fprintf('\n'); 
+        fprintf('\n');
     end
 end
-
+% Check that there is more than 2 groups for logrank test for trend
+if DATA.numGroups < 3 && options.LogRankTrend
+    warning off backtrace
+    warning('Cannot perform logrank test with less than 3 groups, test will be ignored')
+    options.LogRankTrend = false;
+end
 
 end
 
