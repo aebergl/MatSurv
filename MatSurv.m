@@ -786,21 +786,16 @@ Var_OE(isnan(Var_OE)) = 0;
 Var_OE_sum = sum(Var_OE);
 
 %Calculate covariance
-Cov_OE = zeros(n,(DATA.numGroups-1)*(DATA.numGroups-2)/2);
+V = zeros(DATA.numGroups-1);
 if DATA.numGroups > 2 % If there are more than 2 groups
-    counter = 0;
     for i = 1:DATA.numGroups-2
         for j = i+1:DATA.numGroups-1
-            counter = counter + 1;
-            Cov_OE(:,counter) = ( -nf(:,i) .* nf(:,j) .* mf_sum .* (nf_sum - mf_sum)) ./ (nf_sum.^2 .* (nf_sum -1));
+            cov_oe = sum(( -nf(:,i) .* nf(:,j) .* mf_sum .* (nf_sum - mf_sum)) ./ (nf_sum.^2 .* (nf_sum -1)));
+            V(i,j) = cov_oe;
+            V(j,i) = cov_oe;
         end
     end
-    
-    Cov_OE(isnan(Cov_OE)) = 0;
-    Cov_OE_sum = sum(Cov_OE);
-    V = zeros(DATA.numGroups-1);
-    V(tril(true(DATA.numGroups-1),-1))=Cov_OE_sum;
-    V(~tril(true(DATA.numGroups-1),0))=Cov_OE_sum;
+    % Add variance on the diagonal
     V(1:size(V,1)+1:end) = Var_OE_sum;
     
 else % Special case for 2 groups
@@ -818,7 +813,7 @@ p = gammainc(Chi2/2,(DATA.numGroups-1)/2,'upper');
 % Create stats output
 stats.GroupNames = [DATA.GROUPS.GroupName]';
 stats.p_MC = p;
-stats.Chi2_MC = Chi2';
+stats.Chi2_MC = Chi2;
 
 % Caclulate Hazard Ratio
 
@@ -848,21 +843,18 @@ if options.LogRankTrend && DATA.numGroups > 2
     Var_OE_sum = sum(Var_OE);
     
     %Calculate covariance
-    Cov_OE = zeros(n,(DATA.numGroups)*(DATA.numGroups-1)/2);
-    counter = 0;
+    V = zeros(DATA.numGroups);
     for i = 1:DATA.numGroups-1
         for j = i+1:DATA.numGroups
-            counter = counter + 1;
-            Cov_OE(:,counter) = ( -nf(:,i) .* nf(:,j) .* mf_sum .* (nf_sum - mf_sum)) ./ (nf_sum.^2 .* (nf_sum -1));
+            cov_oe = sum(( -nf(:,i) .* nf(:,j) .* mf_sum .* (nf_sum - mf_sum)) ./ (nf_sum.^2 .* (nf_sum -1)));
+            V(i,j) = cov_oe;
+            V(j,i) = cov_oe;
         end
     end
     
-    Cov_OE(isnan(Cov_OE)) = 0;
-    Cov_OE_sum = sum(Cov_OE);
-    V = zeros(DATA.numGroups);
-    V(tril(true(DATA.numGroups),-1))=Cov_OE_sum;
-    V(~tril(true(DATA.numGroups),0))=Cov_OE_sum;
+    % Add variance on the diagonal
     V(1:size(V,1)+1:end) = Var_OE_sum;
+    
     c = (1:DATA.numGroups)';
     Chi2 = (c' * d)^2 / (c' * V * c);
     stats.p_MC_Trend = gammainc(Chi2/2,(1)/2,'upper'); % DF is always 1;
@@ -919,7 +911,7 @@ indx_censored = ((mf_true - mf) < 0);
 %
 if isempty(tf_out) % function called for plotting
     indx_observed = (mf_true ~= 0);
-else % fynction called for log rank test
+else % function called for log rank test
     [~,~,indx_observed] = intersect(tf_out,tf);
 end
 
