@@ -866,8 +866,10 @@ end
 function [DATA] = MatSurvCreateTable(DATA)
 
 for i=1:DATA.numGroups
-    % Get unique time points including censored and add a leading 0
-    tf = [0; unique(DATA.GROUPS(i).TimeVar)];
+    % Get unique time points including censored and add a leading 0 if
+    % needed
+    
+    tf = unique([0; unique(DATA.GROUPS(i).TimeVar)]);
     
     [KM_Events, KM_ALL, Censored_Points] = MatSurvCalculateTables(tf,DATA.GROUPS(i).TimeVar,DATA.GROUPS(i).EventVar,[]);
     
