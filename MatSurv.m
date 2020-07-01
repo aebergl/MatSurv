@@ -233,7 +233,7 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 % * 'CensorInRT': True/False for whether number censored should be listed
 %   in risk table (Default: False)
 %
-% * 'RTtitleAlignment': Where RT title should be aligned (Default: middle)
+% * 'RTtitleAlignment': Where RT title should be aligned (Default: center )
 %
 %   EXAMPLES:
 %   [p,fh,stats] = MatSurv([], [], [],'Xstep',4,'FlipColor',1,'XMinorTick',3);
@@ -442,8 +442,8 @@ else % Creat KM-Plot
     %Fix Y-Axis
     % Limit range from 0 to 1
     axh_KM.YLim = options.YLim;
-    axh_KM.YTick = options.YTick;
-    YMinorStep =  (options.YTick(2) - options.YTick(1) ) / (1+options.YMinorTick);
+    axh_KM.YTick = options.YTicks;
+    YMinorStep =  (options.YTicks(2) - options.YTicks(1) ) / (1+options.YMinorTick);
     axh_KM.YAxis.MinorTickValues = YMinorStep:YMinorStep:1;
     axh_KM.YAxis.MinorTick = 'on';
     axh_KM.YAxis.TickDirection = 'out';
@@ -477,7 +477,7 @@ else % Creat KM-Plot
     
     % Get Xticks
     if ~isempty(options.XLim)
-        axh_KM.XLim = [0 options.XLim];
+        axh_KM.XLim = options.XLim;
     end
     
     if options.RT_KMplot
@@ -556,7 +556,7 @@ else % Creat KM-Plot
             for i = 1:length(axh_KM.XTick)
                 for j = 1:DATA.numGroups
                     if(options.CensorInRT)
-                        text(axh_KM,axh_KM.XTick(i),axh_RT.YTick(end-j+1),sprintf('%u (%u)',RT_X(i,j),RT_Xcensor(i,j)),...
+                        text(axh_KM,axh_KM.XTick(i),-0.05-((j-1)*0.05),sprintf('%u (%u)',RT_X(i,j),RT_Xcensor(i,j)),...
                             'HorizontalAlignment',options.RTtitleAlignment,'VerticalAlignment','middle',...
                             'FontSize',options.BaseFontSize + options.RT_FontSize,'Color',cMAP_RT(j,:))
                     else
@@ -694,7 +694,7 @@ p.addParameter('Xstep',[], @(x)isnumeric(x) && isscalar(x));
 p.addParameter('XTicks',[], @(x)isnumeric(x) && isvector(x));
 p.addParameter('XMinorTick',1, @(x)isnumeric(x) && isscalar(x));
 
-p.addParameter('XLim',[], @(x)isnumeric(x) && isscalar(x));
+p.addParameter('XLim',[], @(x)isnumeric(x) && isvector(x));
 p.addParameter('LineColor','aeb01');
 p.addParameter('LineWidth',2);
 p.addParameter('LineStyle','-');
@@ -712,7 +712,7 @@ p.addParameter('Ylabel','Survival Probability');
 p.addParameter('YlabelOptions',cell(0,0));
 p.addParameter('YLabelFontSize',0);
 p.addParameter('YTickFontSize',-2);
-p.addParameter('YTick',0:0.2:1);
+p.addParameter('YTicks',0:0.2:1);
 p.addParameter('YMinorTick',1);
 
 p.addParameter('Title',[]);
