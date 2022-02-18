@@ -54,7 +54,7 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 %
 % * 'CutPoint': Either a string or scalar/vector with cut points to be used
 %   for defining groups based on a continuous 'GroupVar' input variable
-%   Allowed names are: 'Median', 'Quartile', QuartileAll or 'Tertile'
+%   Allowed names are: 'Median', 'Quartile' or 'Tertile'
 %   If a scalar or vector is given the groups will be defined based on the
 %   cut points. (default: 'Median')
 %
@@ -1102,9 +1102,9 @@ elseif strcmpi('QuartileAll',options.CutPoint)  && isnumeric(GroupVar)
     indx_Q1  = (GroupVar < Cut_Val(1));
     indx_Q2  = (GroupVar >= Cut_Val(1) & GroupVar < Cut_Val(2));
     indx_Q3  = (GroupVar >= Cut_Val(2) & GroupVar < Cut_Val(3));
-    indx_Q4  = (GroupVar > Cut_Val(3));
+    indx_Q4 = (GroupVar > Cut_Val(3));
 
-    DATA.numGroups = 4;
+    DATA.numGroups = 3;
     %Q4
     DATA.GROUPS(1).GroupName = {sprintf('x > %g',Cut_Val(3))};
     DATA.GROUPS(1).TimeVar = TimeVar(indx_Q4);
@@ -1113,14 +1113,10 @@ elseif strcmpi('QuartileAll',options.CutPoint)  && isnumeric(GroupVar)
     DATA.GROUPS(2).GroupName = {sprintf('%g < x < %g',Cut_Val(2),Cut_Val(3))};
     DATA.GROUPS(2).TimeVar = TimeVar(indx_Q3);
     DATA.GROUPS(2).EventVar = EventVarBin(indx_Q3);
-    %Q3
-    DATA.GROUPS(3).GroupName = {sprintf('%g < x < %g',Cut_Val(1),Cut_Val(2))};
-    DATA.GROUPS(3).TimeVar = TimeVar(indx_Q2);
-    DATA.GROUPS(3).EventVar = EventVarBin(indx_Q2);
     %Low
-    DATA.GROUPS(4).GroupName = {sprintf('x < %g',Cut_Val(1))};
-    DATA.GROUPS(4).TimeVar = TimeVar(indx_Q1);
-    DATA.GROUPS(4).EventVar = EventVarBin(indx_Q1);
+    DATA.GROUPS(3).GroupName = {sprintf('x < %g',Cut_Val(1))};
+    DATA.GROUPS(3).TimeVar = TimeVar(indx_Below);
+    DATA.GROUPS(3).EventVar = EventVarBin(indx_Below);
 
     % Vector with several cut pints
 elseif (isvector(options.CutPoint)) && isnumeric(GroupVar)
