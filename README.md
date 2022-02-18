@@ -34,6 +34,8 @@ Compatible with R2016b to R2019b
 
 ## Recent Improvements ##
 
+2022-02-17 : Added options to use all four quartile groups, use `'CutPoint','QuartileAll `
+
 2020-04-08 : Added logrank test for trend, use `'LogRankTrend',true `
 
 ## Simple Example ##
@@ -197,7 +199,7 @@ A test script for MatSurv can be found in the UnitTest directory.
 
 * `CutPoint`: Either a string or scalar/vector with cut points to be used
   for defining groups based on a continuous `GroupVar` input variable
-  Allowed names are: 'Median', 'Quartile' or 'Tertile'
+  Allowed names are: 'Median', 'Quartile', 'QuartileAll' or 'Tertile'
   If a scalar or vector is given, the groups will be defined based on the
   cut points. (default: 'Median')
 
