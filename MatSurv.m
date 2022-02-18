@@ -336,6 +336,7 @@ if options.PairWiseP
         for j = i+1:DATA.numGroups
             counter  = counter + 1;
             DATA_tmp.numGroups = 2;
+            DATA_tmp.numSamples = [DATA.numSamples(i) DATA.numSamples(j)];
             DATA_tmp.GROUPS(1) = DATA.GROUPS(i);
             DATA_tmp.GROUPS(2) = DATA.GROUPS(j);
             [~,stats.ParwiseStats(counter)] = MatSurvLogRank(DATA_tmp,options);
@@ -814,6 +815,7 @@ p = gammainc(Chi2/2,(DATA.numGroups-1)/2,'upper');
 stats.GroupNames = [DATA.GROUPS.GroupName]';
 stats.p_MC = p;
 stats.Chi2_MC = Chi2;
+stats.numSamples = DATA.numSamples;
 
 % Caclulate Hazard Ratio
 
@@ -941,9 +943,10 @@ if ~isempty(indx_rem)
         fprintf('\n');
     end
 end
+
 DATA.GROUPS(indx_rem) = [];
 DATA.numGroups = DATA.numGroups - length(indx_rem);
-
+DATA.numSamples = numSamples;
 % Make sure that there is not more than one Group with ZERO events
 nGroupsNoEvents = find(arrayfun(@(x) sum(x.EventVar), DATA.GROUPS) == 0);
 if length(nGroupsNoEvents) > 1
