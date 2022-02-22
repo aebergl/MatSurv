@@ -14,10 +14,10 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 %
 % * 'EventVar' is a vector or cell array defining events or censored
 %   observations. Events are defined with a 1 and censored point with a 0. By
-%   default 'Dead', 'Deceased', 'Relapsed', 'Yes', 'Event' 'Progression' &
-%   'Progressed' are considered as events.
-%   'Alive', 'Living', 'Not Relapsed', 'DiseaseFree', 'No' 'NoEvent'
-%   'Censored' 'NoProgression' are considers as censored
+%   default 'Dead', 'Deceased', 'Relapsed', 'Yes', 'Event', 'Progression',
+%   'Progressed', and 'TRUE' are considered as events.
+%   'Alive', 'Living', 'Not Relapsed', 'DiseaseFree', 'No', 'NoEvent',
+%   'Censored', 'NoProgression', and 'FALSE' are considers as censored
 %   'EventDefinition' can be used to define other types of events
 %
 % * 'GroupVar' is a vector or cell array defining the different groups.
@@ -66,7 +66,7 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 % * 'GroupOrder': A cell array or vector defining the group order to be used in the
 %   legend. The vector needs to have the same number of elements as groups
 %   while the cell array does not have that requirement.
-%   (default: Groups are sorthed by 'GroupToUse' if defined, else alphabetically)
+%   (default: Groups are sorted by 'GroupToUse' if defined, else alphabetically)
 %
 % * 'EventDefinition': Two element cell array where the first cell defines
 %   the event and the second censored values. Example {'Dead','Alive'}
@@ -950,18 +950,18 @@ DATA.numSamples = numSamples;
 % Make sure that there is not more than one Group with ZERO events
 nGroupsNoEvents = find(arrayfun(@(x) sum(x.EventVar), DATA.GROUPS) == 0);
 if length(nGroupsNoEvents) > 1
-    options.CalcP = 0;
+    options.CalcP = 1;
     if ~options.NoWarnings
         fprintf('\n');
         fprintf('*********************************\n');
-        fprintf('Warning! logrank will not calculated since there are %u Groups with no events\n',length(nGroupsNoEvents) );
+        fprintf('Warning! Please note that there are %u Groups with no events\n',length(nGroupsNoEvents) );
         fprintf('The Groups are: ')
         for i=1:length(nGroupsNoEvents)-1
             fprintf('%s, ',DATA.GROUPS(nGroupsNoEvents(i)).GroupName{1});
         end
         i = i + 1;
         fprintf('%s\n',DATA.GROUPS(nGroupsNoEvents(i)).GroupName{1})
-        fprintf('Please remove or merge groups\n')
+        fprintf('Please proceed with caution\n')
         fprintf('*********************************\n');
         fprintf('\n');
     end
@@ -1182,11 +1182,11 @@ elseif iscell(EventVar)
     else % Set values based on common event types such as dead/alive
         indx_Event = strcmpi('Dead',EventVar) | strcmpi('Deceased',EventVar) | strcmpi('Relapsed',EventVar)...
             |  strcmpi('Yes',EventVar) | strcmpi('Event',EventVar) | strcmpi('Progression',EventVar)...
-            | strcmpi('Progressed',EventVar);
+            | strcmpi('Progressed',EventVar) | strcmpi('TRUE',EventVar);
         
         indx_NoEvent = strcmpi('Alive',EventVar) | strcmpi('Living',EventVar) | strcmpi('NotRelapsed',EventVar)...
             | strcmpi('DiseaseFree',EventVar) | strcmpi('No',EventVar) | strcmpi('Censored',EventVar)...
-            | strcmpi('NoProgression',EventVar) | strcmpi('NoEvent',EventVar);
+            | strcmpi('NoProgression',EventVar) | strcmpi('NoEvent',EventVar) | strcmpi('FALSE',EventVar);
         
         if sum(indx_Event) + sum(indx_NoEvent) == length(EventVar)
             EventVarBin(indx_Event) = 1;
