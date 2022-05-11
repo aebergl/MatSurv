@@ -241,7 +241,11 @@ A test script for MatSurv can be found in the UnitTest directory.
  
 
 KM plot options
-* `legend`: Whether to show group legend. Default: true
+* `Legend`: Whether to show group legend. Default: true
+
+* `LegendLocation`: Location of the legend: Default: 'best'
+
+* `LegendOrientation`: Orientation of the legend. Default: 'vertical'
 
 * `LineColor`: Either a matrix of size numLevels-by-3 representing the
    colormap to be used, or a string for a MATLAB colormap (lines, parula,
