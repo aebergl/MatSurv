@@ -100,7 +100,11 @@ function [varargout] = MatSurv(TimeVar, EventVar, GroupVar, varargin)
 %
 % KM plot options
 %
-% * 'legend': Whether to show group legend. Default: true
+% * 'Legend': Whether to show group legend. Default: true
+%
+% * 'LegendLocation': Location of the legend: Default: 'best'
+%
+% * 'LegendOrientation': Orientation of the legend. Default: 'vertical'
 %
 % * 'LineColor': Either a matrix of size numLevels-by-3 representing the
 %   colormap to be used or a string for a MATLAB colormap (lines, parula,
@@ -469,8 +473,8 @@ else % Creat KM-Plot
     end
     
     % Set legend
-    if options.legend
-        h_LE=legend(S,[DATA.GROUPS(:).GroupName]);
+    if options.Legend
+        h_LE=legend(axh_KM,S,[DATA.GROUPS(:).GroupName],'Location',options.LegendLocation,'Orientation',options.LegendOrientation);
         h_LE.Box='off';
         title(h_LE,DATA.GroupType);
         h_LE.FontSize=options.BaseFontSize + options.LegendFontSize;
@@ -659,7 +663,9 @@ function params = MatSurvParseInput(varargin)
 %Parse input and set defualt values
 p = inputParser;
 
-p.addParameter('legend',true);
+p.addParameter('Legend',true);
+p.addParameter('LegendLocation','best');
+p.addParameter('LegendOrientation','vertical');
 
 p.addParameter('NoPlot',false);
 p.addParameter('NoRiskTable',false);
