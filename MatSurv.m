@@ -366,7 +366,6 @@ else % Creat KM-Plot
     
     % Create Figure Window
     fh=figure('Name','MatSurv KM-Plot','Color','w','Tag','MatSurv KM-Plot figure');
-    
     %Create Axes
     if options.NoRiskTable || options.RT_KMplot
         axh_KM = axes(fh,'NextPlot','add','tag','KM-Plot');
@@ -784,6 +783,7 @@ for i = 1:DATA.numGroups-1
 end
 
 Var_OE(isnan(Var_OE)) = 0;
+
 Var_OE_sum = sum(Var_OE);
 
 %Calculate covariance
@@ -791,7 +791,13 @@ V = zeros(DATA.numGroups-1);
 if DATA.numGroups > 2 % If there are more than 2 groups
     for i = 1:DATA.numGroups-2
         for j = i+1:DATA.numGroups-1
-            cov_oe = sum(( -nf(:,i) .* nf(:,j) .* mf_sum .* (nf_sum - mf_sum)) ./ (nf_sum.^2 .* (nf_sum -1)));
+            Numinator = -nf(:,i) .* nf(:,j) .* mf_sum .* (nf_sum - mf_sum);
+            Denominator = nf_sum.^2 .* (nf_sum - 1);
+            % Making sure that we are NOT dividing by ZERO
+            indx_ZERO = Denominator == 0;
+            Numinator(indx_ZERO) = [];
+            Denominator(indx_ZERO) = [];
+            cov_oe = sum( Numinator ./ Denominator);
             V(i,j) = cov_oe;
             V(j,i) = cov_oe;
         end
@@ -1150,13 +1156,12 @@ end
 end
 
 function [TimeVar, EventVarBin] = MatSurvCensorTimeMax(TimeVar, EventVarBin, options)
-indx_TimeMax = (TimeVar > options.TimeMax);
-TimeVar(indx_TimeMax) = options.TimeMax;
-EventVarBin(indx_TimeMax) = 0;
+    indx_TimeMax = (TimeVar >= options.TimeMax);
+    TimeVar(indx_TimeMax) = options.TimeMax;
+    EventVarBin(indx_TimeMax) = 0;
 end
 
 function [EventVarBin] = MatSurvDefineEventVar(EventVar, options)
-
 % Set all entries to zeros
 EventVarBin = zeros(size(EventVar));
 

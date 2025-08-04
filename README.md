@@ -21,7 +21,7 @@ The general usage is:
 
 
 ## Why Matsurv ##
-MatSurv allows MATLAB users to create KM-plots with a risk table and also to perform a log-rank test between two or more groups. An event is, for example, death, relapse of disease, or a new metastatic tumor. If none of these events occur during the study period, the time-to-event is unknown, this point is called censored.  A risk table describe the number of patients that are still “at-risk” at a specific timepoint. MatSurv also provides a fine grained customization of the KM-plots, making it suitable for publications. MatSurv hopefully will make the life easier for fellow Bioinformaticians (and other professionals) who prefer MATLAB over R.
+MatSurv allows MATLAB users to create KM-plots with a risk table and also to perform a log-rank test between two or more groups. An event is, for example, death, relapse of disease, or a new metastatic tumor. If none of these events occur during the study period, the time-to-event is unknown, this point is called censored.  A risk table describe the number of patients that are still “at-risk” at a specific timepoint. MatSurv also provides a fine grained customization of the KM-plots, making it suitable for publications. MatSurv hopefully will make life easier for fellow Bioinformaticians (and other professionals) who prefer MATLAB over R.
 
 
 ## Citing MatSurv ##
@@ -30,9 +30,11 @@ Creed et al., (2020). MatSurv: Survival analysis and visualization in MATLAB. Jo
 
 ## MATLAB Release Compatibility ##
 
-Compatible with R2016b to R2019b
+Compatible with R2016b to R2024b
 
 ## Recent Improvements ##
+
+2025-08-04 : Updated calculation of covariance matrix to check and adjust for dividing by zero
 
 2022-02-17 : Added options to use all four quartile groups, use `'CutPoint','QuartileAll `
 
@@ -211,7 +213,7 @@ A test script for MatSurv can be found in the UnitTest directory.
 * `GroupOrder`: A cell array or vector defining the group order to be used in the
    legend. The vector needs to have the same number of elements as groups 
    while the cell array does not have that requirement. 
-   (default: Groups are sorthed by `GroupsToUse` if defined, else alphabetically)
+   (default: Groups are sorted by `GroupsToUse` if defined, else alphabetically)
 
 * `EventDefinition`: Two element cell array where the first cell defines
   the event and the second defines censored values. Example {'Dead,'Alive'}
